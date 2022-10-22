@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+  app:
+    image: adhocore/lemp:8.0
+    container_name: softexpert
+    volumes:
+      - ./api:/var/www/html/
+      - db_data:/var/lib/mysql
+      # Here you can also volume php ini settings
+      # - /path/to/zz-overrides:/usr/local/etc/php/conf.d/zz-overrides.ini
+    ports:
+      - 8181:80
+      - 444:444
+      - 3307:3306
+
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: appdb
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+
+volumes:
+  db_data: {}
