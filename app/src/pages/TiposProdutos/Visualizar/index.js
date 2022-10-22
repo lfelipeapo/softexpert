@@ -1,3 +1,4 @@
+import { isNil } from "lodash";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -14,6 +15,10 @@ export const Visualizar = (props) => {
   const [data, setData] = useState([]);
 
   const [id] = useState(props.match.params.id);
+
+  const formatData = (dataSql) => {
+    if (!isNil(dataSql)) return dataSql.split("-").reverse().join("/");
+  };
 
   useEffect(() => {
     const getTiposto = async () => {
@@ -41,9 +46,9 @@ export const Visualizar = (props) => {
       <hr />
       <ConteudoTip>ID do Imposto: {data.id_imposto}</ConteudoTip>
       <hr />
-      <ConteudoTip>Data de Cadastro: {data.data_cad}</ConteudoTip>
+      <ConteudoTip>Data de Cadastro: {formatData(data.data_cad)}</ConteudoTip>
       <hr />
-      <ConteudoTip>Data de Atualização: {data.data_at}</ConteudoTip>
+      <ConteudoTip>Data de Atualização: {formatData(data.data_at)}</ConteudoTip>
     </Container>
   );
 };

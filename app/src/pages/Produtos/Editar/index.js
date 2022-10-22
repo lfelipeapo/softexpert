@@ -20,10 +20,11 @@ import {
 export const Editar = (props) => {
   const date = new Date().toJSON().slice(0, 10);
   const id = props.match.params.id;
-  const [tipos_produtos, setTiposProdutos] = useState({
+  const [produtos, setProdutos] = useState({
     id: id,
     nome: "",
-    id_imposto: "",
+    preco: "",
+    id_tipo_produto: "",
     date_cad: "",
     date_at: "",
   });
@@ -35,28 +36,31 @@ export const Editar = (props) => {
     mensagem: "",
   });
 
-  const valorInput = (e) =>
-    setTiposProdutos({ ...tipos_produtos, [e.target.name]: e.target.value });
+  const valorNome = (e) =>
+    setProdutos({ ...produtos, [e.target.name]: e.target.value });
+  
+  const valorPreco = (e) =>
+    setProdutos({ ...produtos, [e.target.name]: e.target.value });
 
   const valorSelect = (e) =>
-    setTiposProdutos({ ...tipos_produtos, [e.target.name]: e.target.value });
+    setProdutos({ ...produtos, [e.target.name]: e.target.value });
 
-  const getImpostos = useCallback(async () => {
-    fetch("http://localhost:8181/impostos")
+  const getTiposProdutos = useCallback(async () => {
+    fetch("http://localhost:8181/tipos-produtos")
       .then((response) => response.json())
       .then((responseJson) => {
         setData(responseJson.records);
       });
   }, []);
 
-  const edTiposProdutos = async (e) => {
+  const edProdutos = async (e) => {
     e.preventDefault();
-    await fetch("http://localhost:8181/tipos-produtos/update", {
+    await fetch("http://localhost:8181/produtos/update", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ tipos_produtos: tipos_produtos }),
+      body: JSON.stringify({ produtos: produtos }),
     })
       .then((response) => response.json())
       .then((responseJson) => {
@@ -70,36 +74,35 @@ export const Editar = (props) => {
             type: "success",
             mensagem: responseJson.mensagem,
           });
-          getImpostos();
+          getTiposProdutos();
         }
       })
       .catch(() => {
         setStatus({
           type: "erro",
-          mensagem: "Tipo não cadastro com sucesso, tente mais tarde!",
+          mensagem: "Produto não cadastro com sucesso, tente mais tarde!",
         });
       });
   };
 
-  const getTiposProduto = useCallback(async () => {
-    await fetch("http://localhost:8181/tipos-produtos/" + id)
+  const getProduto = useCallback(async () => {
+    await fetch("http://localhost:8181/produtos/" + id)
       .then((response) => response.json())
       .then((responseJson) => {
-        setTiposProdutos({
+        setProdutos({
           id: id,
-          nome: responseJson.tipos_produtos.nome,
-          id_imposto: responseJson.tipos_produtos.id_imposto,
-          data_cad: responseJson.tipos_produtos.data_cad,
+          nome: responseJson.produtos.nome,
+          preco: responseJson.produtos.preco,
+          id_tipo_produto: responseJson.produtos.id_tipo_produto,
+          data_cad: responseJson.produtos.data_cad,
           data_at: date,
         });
       });
   }, [date, id]);
 
-  console.log(tipos_produtos);
+  useEffect(getProduto, [id, date, getProduto]);
 
-  useEffect(getTiposProduto, [id, date, getTiposProduto]);
-
-  useEffect(getImpostos, [getImpostos]);
+  useEffect(getTiposProdutos, [getTiposProdutos]);
 
   return (
     <Container className="principal">
@@ -107,7 +110,7 @@ export const Editar = (props) => {
         <ConteudoTitulo>
           <Titulo>Editar</Titulo>
           <BotaoAcao>
-            <Link to="/tipos-produtos">
+            <Link to="/produtos">
               <ButtonInfo>Listar</ButtonInfo>
             </Link>
           </BotaoAcao>
@@ -124,25 +127,34 @@ export const Editar = (props) => {
           ""
         )}
 
-        <Form onSubmit={edTiposProdutos}>
-          <Label>Nome do Tipo do Produto: </Label>
+        <Form onSubmit={edProdutos}>
+          <Label>Nome do Produto: </Label>
           <Input
             type="text"
             name="nome"
-            value={tipos_produtos.nome}
-            placeholder="Tipo do Produto"
-            onChange={valorInput}
+            value={produtos.nome}
+            placeholder="Produto"
+            onChange={valorNome}
           />
 
-          <Label>Imposto: </Label>
+          <Label>Preço: </Label>
+          <Input
+            type="text"
+            name="preco"
+            value={produtos.preco}
+            placeholder="Preço do Produto"
+            onChange={valorPreco}
+          />
+
+          <Label>Produto: </Label>
           <Select
-            name="id_imposto"
+            name="id_tipo_produto"
             onChange={valorSelect}
-            value={tipos_produtos.id_imposto}
+            value={produtos.id_tipo_produto}
           >
-            {Object.values(data).map((imposto) => (
-              <option key={imposto.id} value={imposto.id}>
-                {imposto.nome}
+            {Object.values(data).map((tipo_produto) => (
+              <option key={tipo_produto.id} value={tipo_produto.id}>
+                {tipo_produto.nome}
               </option>
             ))}
           </Select>

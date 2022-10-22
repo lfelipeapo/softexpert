@@ -1,3 +1,4 @@
+import { isNil } from "lodash";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
@@ -22,6 +23,21 @@ export const Home = () => {
     type: "",
     mensagem: "",
   });
+
+  const convertReal = (number) => {
+    const options = {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 3,
+    };
+    const formatNumber = new Intl.NumberFormat("pt-BR", options);
+    return formatNumber.format(number);
+  };
+
+  const formatData = (dataSql) => {
+    if (!isNil(dataSql)) return dataSql.split("-").reverse().join("/");
+  };
 
   const getProdutos = async () => {
     fetch("http://localhost:8181/produtos")
@@ -97,10 +113,10 @@ export const Home = () => {
             <tr key={produto.id}>
               <td>{produto.id}</td>
               <td>{produto.nome}</td>
-              <td>{produto.preco}</td>
+              <td>{convertReal(produto.preco, produto.preco)}</td>
               <td>{produto.id_tipo_produto}</td>
-              <td>{produto.data_cad}</td>
-              <td>{produto.data_at}</td>
+              <td>{formatData(produto.data_cad)}</td>
+              <td>{formatData(produto.data_at)}</td>
               <td>
                 <Link to={"/produtos/visualizar/" + produto.id}>
                   <ButtonPrimary>Visualizar</ButtonPrimary>
@@ -108,9 +124,7 @@ export const Home = () => {
                 <Link to={"/produtos/editar/" + produto.id}>
                   <ButtonWarning>Editar</ButtonWarning>
                 </Link>
-                <ButtonDanger
-                  onClick={() => apagarProduto(produto.id)}
-                >
+                <ButtonDanger onClick={() => apagarProduto(produto.id)}>
                   Apagar
                 </ButtonDanger>
               </td>

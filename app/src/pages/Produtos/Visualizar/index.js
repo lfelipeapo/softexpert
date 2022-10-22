@@ -1,3 +1,4 @@
+import { isNil } from "lodash";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -14,6 +15,21 @@ export const Visualizar = (props) => {
   const [data, setData] = useState([]);
 
   const [id] = useState(props.match.params.id);
+
+  const formatData = (dataSql) => {
+    if (!isNil(dataSql)) return dataSql.split("-").reverse().join("/");
+  };
+
+  const convertReal = (number) => {
+    const options = {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 3,
+    };
+    const formatNumber = new Intl.NumberFormat("pt-BR", options);
+    return formatNumber.format(number);
+  };
 
   useEffect(() => {
     const getProduto = async () => {
@@ -39,16 +55,19 @@ export const Visualizar = (props) => {
       <hr />
       <ConteudoProduto>Nome: {data.nome}</ConteudoProduto>
       <hr />
-      <ConteudoProduto>Preço: {data.preco}</ConteudoProduto>
+      <ConteudoProduto>Preço: {convertReal(data.preco)}</ConteudoProduto>
       <hr />
       <ConteudoProduto>
         ID do Tipo do Produto: {data.id_tipo_produto}
       </ConteudoProduto>
       <hr />
-      <ConteudoProduto>Data de Cadastro: {data.data_cad}</ConteudoProduto>
+      <ConteudoProduto>
+        Data de Cadastro: {formatData(data.data_cad)}
+      </ConteudoProduto>
       <hr />
-      <ConteudoProduto>Data de Atualização: {data.data_at}</ConteudoProduto>
-      
+      <ConteudoProduto>
+        Data de Atualização: {formatData(data.data_at)}
+      </ConteudoProduto>
     </Container>
   );
 };

@@ -1,3 +1,4 @@
+import { isNil } from "lodash";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
@@ -22,6 +23,10 @@ export const Home = () => {
     type: "",
     mensagem: "",
   });
+
+  const formatData = (dataSql) => {
+    if (!isNil(dataSql)) return dataSql.split("-").reverse().join("/");
+  };
 
   const getClientes = async () => {
     fetch("http://localhost:8181/clientes")
@@ -98,8 +103,8 @@ export const Home = () => {
             <tr key={cliente.cli_id}>
               <td>{cliente.cli_id}</td>
               <td>{cliente.cli_nome}</td>
-              <td>{cliente.data_cad}</td>
-              <td>{cliente.data_at}</td>
+              <td>{formatData(cliente.data_cad)}</td>
+              <td>{formatData(cliente.data_at)}</td>
               <td>
                 <Link to={"/clientes/visualizar/" + cliente.cli_id}>
                   <ButtonPrimary>Visualizar</ButtonPrimary>
