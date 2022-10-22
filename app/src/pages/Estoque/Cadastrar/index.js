@@ -20,10 +20,10 @@ import {
 export const Cadastrar = () => {
   const date = new Date().toJSON().slice(0, 10);
 
-  const [tipos_produtos, setTiposProdutos] = useState({
+  const [estoque, setEstoque] = useState({
     id: "",
-    nome: "",
-    id_imposto: "",
+    prod_id: "",
+    estoque_qtde: "",
     date_cad: date,
     date_at: null,
   });
@@ -36,32 +36,32 @@ export const Cadastrar = () => {
   });
 
   const valorInput = (e) =>
-    setTiposProdutos({ ...tipos_produtos, [e.target.name]: e.target.value });
+    setEstoque({ ...estoque, [e.target.name]: e.target.value });
 
   const valorSelect = (e) =>
-    setTiposProdutos({ ...tipos_produtos, [e.target.name]: e.target.value });
+    setEstoque({ ...estoque, [e.target.name]: e.target.value });
 
-  const getImpostos = useCallback(async () => {
-    fetch("http://localhost:8181/impostos")
+  const getProdutos = useCallback(async () => {
+    fetch("http://localhost:8181/produtos")
       .then((response) => response.json())
       .then((responseJson) => {
         setData(responseJson.records);
-        setTiposProdutos({
-          ...tipos_produtos,
-          id_imposto: responseJson.records[0].id,
+        setEstoque({
+          ...estoque,
+          prod_id: responseJson.records[0].id,
         });
       });
-  }, [tipos_produtos]);
+  }, [estoque]);
 
-  const cadTiposProdutos = useCallback(
+  const cadEstoque = useCallback(
     async (e) => {
       e.preventDefault();
-      await fetch("http://localhost:8181/tipos-produtos/save", {
+      await fetch("http://localhost:8181/estoque/save", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ tipos_produtos }),
+        body: JSON.stringify({ estoque }),
       })
         .then((response) => response.json())
         .then((responseJson) => {
@@ -75,21 +75,21 @@ export const Cadastrar = () => {
               type: "success",
               mensagem: responseJson.mensagem,
             });
-            getImpostos();
+            getProdutos();
           }
         })
         .catch(() => {
           setStatus({
             type: "erro",
-            mensagem: "Tipo não cadastro com sucesso, tente mais tarde!",
+            mensagem: "Estoque não cadastro com sucesso, tente mais tarde!",
           });
         });
     },
-    [getImpostos, tipos_produtos]
+    [getProdutos, estoque]
   );
 
   useEffect(() => {
-    getImpostos();
+    getProdutos();
   }, []);
 
   return (
@@ -98,7 +98,7 @@ export const Cadastrar = () => {
         <ConteudoTitulo>
           <Titulo>Cadastrar</Titulo>
           <BotaoAcao>
-            <Link to="/tipos-produtos">
+            <Link to="/estoque">
               <ButtonInfo>Listar</ButtonInfo>
             </Link>
           </BotaoAcao>
@@ -115,27 +115,27 @@ export const Cadastrar = () => {
           ""
         )}
 
-        <Form onSubmit={cadTiposProdutos}>
-          <Label>Nome do Tipo do Produto: </Label>
-          <Input
-            type="text"
-            name="nome"
-            placeholder="Tipo do Produto"
-            onChange={valorInput}
-          />
-
-          <Label>Imposto: </Label>
+        <Form onSubmit={cadEstoque}>
+          <Label>Produto: </Label>
           <Select
-            name="id_imposto"
+            name="prod_id"
             onChange={valorSelect}
-            value={tipos_produtos.id_imposto}
+            value={estoque.prod_id}
           >
-            {Object.values(data).map((imposto) => (
-              <option key={imposto.id} value={imposto.id}>
-                {imposto.nome}
+            {Object.values(data).map((produto) => (
+              <option key={produto.id} value={produto.id}>
+                {produto.nome}
               </option>
             ))}
           </Select>
+
+          <Label>Quantidade: </Label>
+          <Input
+            type="text"
+            name="estoque_qtde"
+            placeholder="Quantidade"
+            onChange={valorInput}
+          />
 
           <ButtonSuccess type="submit">Cadastrar</ButtonSuccess>
         </Form>

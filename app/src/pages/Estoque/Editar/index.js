@@ -20,10 +20,10 @@ import {
 export const Editar = (props) => {
   const date = new Date().toJSON().slice(0, 10);
   const id = props.match.params.id;
-  const [tipos_produtos, setTiposProdutos] = useState({
+  const [estoque, setEstoque] = useState({
     id: id,
-    nome: "",
-    id_imposto: "",
+    prod_id: "",
+    estoque_qtde: "",
     date_cad: "",
     date_at: "",
   });
@@ -36,27 +36,27 @@ export const Editar = (props) => {
   });
 
   const valorInput = (e) =>
-    setTiposProdutos({ ...tipos_produtos, [e.target.name]: e.target.value });
+    setEstoque({ ...estoque, [e.target.name]: e.target.value });
 
   const valorSelect = (e) =>
-    setTiposProdutos({ ...tipos_produtos, [e.target.name]: e.target.value });
+    setEstoque({ ...estoque, [e.target.name]: e.target.value });
 
-  const getImpostos = useCallback(async () => {
-    fetch("http://localhost:8181/impostos")
+  const getProdutos = useCallback(async () => {
+    fetch("http://localhost:8181/produtos")
       .then((response) => response.json())
       .then((responseJson) => {
         setData(responseJson.records);
       });
   }, []);
 
-  const edTiposProdutos = async (e) => {
+  const edEstoque = async (e) => {
     e.preventDefault();
-    await fetch("http://localhost:8181/tipos-produtos/update", {
+    await fetch("http://localhost:8181/estoque/update", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ tipos_produtos: tipos_produtos }),
+      body: JSON.stringify({ estoque: estoque }),
     })
       .then((response) => response.json())
       .then((responseJson) => {
@@ -70,36 +70,34 @@ export const Editar = (props) => {
             type: "success",
             mensagem: responseJson.mensagem,
           });
-          getImpostos();
+          getProdutos();
         }
       })
       .catch(() => {
         setStatus({
           type: "erro",
-          mensagem: "Tipo não cadastro com sucesso, tente mais tarde!",
+          mensagem: "Estoque não cadastro com sucesso, tente mais tarde!",
         });
       });
   };
 
-  const getTiposProduto = useCallback(async () => {
-    await fetch("http://localhost:8181/tipos-produtos/" + id)
+  const getEstoque = useCallback(async () => {
+    await fetch("http://localhost:8181/estoque/" + id)
       .then((response) => response.json())
       .then((responseJson) => {
-        setTiposProdutos({
+        setEstoque({
           id: id,
-          nome: responseJson.tipos_produtos.nome,
-          id_imposto: responseJson.tipos_produtos.id_imposto,
-          data_cad: responseJson.tipos_produtos.data_cad,
+          prod_id: responseJson.estoque.prod_id,
+          estoque_qtde: responseJson.estoque.estoque_qtde,
+          data_cad: responseJson.estoque.data_cad,
           data_at: date,
         });
       });
   }, [date, id]);
 
-  console.log(tipos_produtos);
+  useEffect(getEstoque, [id, date, getEstoque]);
 
-  useEffect(getTiposProduto, [id, date, getTiposProduto]);
-
-  useEffect(getImpostos, [getImpostos]);
+  useEffect(getProdutos, [getProdutos]);
 
   return (
     <Container className="principal">
@@ -107,7 +105,7 @@ export const Editar = (props) => {
         <ConteudoTitulo>
           <Titulo>Editar</Titulo>
           <BotaoAcao>
-            <Link to="/tipos-produtos">
+            <Link to="/estoque">
               <ButtonInfo>Listar</ButtonInfo>
             </Link>
           </BotaoAcao>
@@ -124,28 +122,24 @@ export const Editar = (props) => {
           ""
         )}
 
-        <Form onSubmit={edTiposProdutos}>
-          <Label>Nome do Tipo do Produto: </Label>
-          <Input
-            type="text"
-            name="nome"
-            value={tipos_produtos.nome}
-            placeholder="Tipo do Produto"
-            onChange={valorInput}
-          />
-
-          <Label>Imposto: </Label>
-          <Select
-            name="id_imposto"
-            onChange={valorSelect}
-            value={tipos_produtos.id_imposto}
-          >
-            {Object.values(data).map((imposto) => (
-              <option key={imposto.id} value={imposto.id}>
-                {imposto.nome}
+        <Form onSubmit={edEstoque}>
+          <Label>Produto: </Label>
+          <Select name="prod_id" onChange={valorSelect} value={estoque.prod_id}>
+            {Object.values(data).map((produto) => (
+              <option key={produto.id} value={produto.id}>
+                {produto.nome}
               </option>
             ))}
           </Select>
+
+          <Label>Quantidade: </Label>
+          <Input
+            type="text"
+            name="estoque_qtde"
+            value={estoque.estoque_qtde}
+            placeholder="Quantidade"
+            onChange={valorInput}
+          />
 
           <ButtonSuccess type="submit">Editar</ButtonSuccess>
         </Form>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Image } from "react";
 import { Link } from "react-router-dom";
 
 import {
@@ -9,7 +9,8 @@ import {
   Titulo,
   ButtonPrimary,
   SVGHome,
-  SVGMouse
+  SVGMouse,
+  ImgContent,
 } from "./styles";
 
 export const BemVindo = () => {
@@ -17,6 +18,10 @@ export const BemVindo = () => {
     <Container className="principal">
       <ConteudoTitulo>
         <Titulo>Seja Bem-vindo</Titulo>
+        <Titulo>SoftMarket</Titulo>
+        <ImgContent>
+          <img src="/assets/images/logo-market.png"></img>
+        </ImgContent>
       </ConteudoTitulo>
       <Content>
         <Table>
@@ -58,8 +63,8 @@ export const BemVindo = () => {
                 </Link>
               </td>
               <td>
-                <Link to={"/vendas/"}>
-                  <ButtonPrimary>Vendas</ButtonPrimary>
+                <Link to={"/carrinho/"}>
+                  <ButtonPrimary>Carrinho de Compras</ButtonPrimary>
                 </Link>
               </td>
             </tr>

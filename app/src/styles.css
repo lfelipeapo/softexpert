@@ -1,6 +1,13 @@
+@font-face {
+  font-family: "Raleway";
+  src: url("https://fonts.googleapis.com/css?family=Raleway");
+}
+
 html {
+  font-family: "Raleway";
   background: linear-gradient(to bottom,#1cb5e0,#000046);
-  height: 100%;
+  height: auto;
+  width: 100%;
 }
 
 a {

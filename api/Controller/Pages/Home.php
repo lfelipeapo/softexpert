@@ -16,4 +16,9 @@ class Home extends Controller
 
         parent::render('Home');
     }
+
+    public static function renderCarrinho()
+    {
+        parent::render('Carrinho/index');
+    }
 }

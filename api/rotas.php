@@ -122,6 +122,9 @@ switch (URL) {
         EstoqueController::delete($id);
         break;
 
+    case PATH[1] === 'carrinho':
+        Home::renderCarrinho();
+
     default:
         echo "Erro 404";
         break;
