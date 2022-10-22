@@ -86,7 +86,8 @@ export const Home = () => {
             <th>ID</th>
             <th>Nome</th>
             <th>Id do Imposto</th>
-            <th></th>
+            <th>Data do Cadastro</th>
+            <th>Data da Atualização</th>
           </tr>
         </thead>
         <tbody>
@@ -95,6 +96,8 @@ export const Home = () => {
               <td>{tipos_produtos.id}</td>
               <td>{tipos_produtos.nome}</td>
               <td>{tipos_produtos.id_imposto}</td>
+              <td>{tipos_produtos.data_cad}</td>
+              <td>{tipos_produtos.data_at}</td>
               <td>
                 <Link to={"/tipos-produtos/visualizar/" + tipos_produtos.id}>
                   <ButtonPrimary>Visualizar</ButtonPrimary>

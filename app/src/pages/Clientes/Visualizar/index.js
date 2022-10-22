@@ -37,8 +37,11 @@ export const Visualizar = (props) => {
           </BotaoAcao>
         </ConteudoTitulo>
         <ConteudoCli>ID: {data.cli_id}</ConteudoCli>
+        <hr />
         <ConteudoCli>Nome do Cliente: {data.cli_nome}</ConteudoCli>
+        <hr />
         <ConteudoCli>Data do Cadastro: {data.data_cad}</ConteudoCli>
+        <hr />
         <ConteudoCli>Data da Atualização: {data.data_at}</ConteudoCli>
       </Container>
     );

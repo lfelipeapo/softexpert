@@ -19,12 +19,12 @@ class ProdutosModel extends Model
         if ($this->rows > 0) {
             $response = [
                 "erro" => false,
-                "mensagem" => "Tipo cadastrado com sucesso!"
+                "mensagem" => "Produto cadastrado com sucesso!"
             ];
         } else {
             $response = [
                 "erro" => true,
-                "mensagem" => "Tipo não cadastrado, tente novamente!"
+                "mensagem" => "Produto não cadastrado, tente novamente!"
             ];
         }
 
@@ -40,7 +40,7 @@ class ProdutosModel extends Model
         if ($this->rows != 0) {
             $response = [
                 "erro" => false,
-                "mensagem" => "Tipo atualizado com sucesso!"
+                "mensagem" => "Produto atualizado com sucesso!"
             ];
         } else {
             $response = [

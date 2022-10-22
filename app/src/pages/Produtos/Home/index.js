@@ -23,14 +23,14 @@ export const Home = () => {
     mensagem: "",
   });
 
-  const getTiposProdutos = async () => {
-    fetch("http://localhost:8181/tipos-produtos")
+  const getProdutos = async () => {
+    fetch("http://localhost:8181/produtos")
       .then((response) => response.json())
       .then((responseJson) => setData(responseJson.records));
   };
 
-  const apagarTiposProduto = async (idTiposProduto) => {
-    await fetch("http://localhost:8181/tipos-produtos/delete/" + idTiposProduto, {method: "DELETE"})
+  const apagarProduto = async (idProduto) => {
+    await fetch("http://localhost:8181/produtos/delete/" + idProduto, {method: "DELETE"})
       .then((response) => response.json())
       .then((responseJson) => {
         if (responseJson.erro) {
@@ -43,7 +43,7 @@ export const Home = () => {
             type: "success",
             mensagem: responseJson.mensagem,
           });
-          getTiposProdutos();
+          getProdutos();
         }
       })
       .catch(() => {
@@ -55,7 +55,7 @@ export const Home = () => {
   };
 
   useEffect(() => {
-    getTiposProdutos();
+    getProdutos();
   }, []);
 
   return (
@@ -63,7 +63,7 @@ export const Home = () => {
       <ConteudoTitulo>
         <Titulo>Listar</Titulo>
         <BotaoAcao>
-          <Link to="/tipos-produtos/cadastrar">
+          <Link to="/produtos/cadastrar">
             <ButtonSuccess>Cadastrar</ButtonSuccess>
           </Link>
         </BotaoAcao>
@@ -85,25 +85,31 @@ export const Home = () => {
           <tr>
             <th>ID</th>
             <th>Nome</th>
-            <th>Id do Imposto</th>
+            <th>Preço</th>
+            <th>Id dos Tipos do Produto</th>
+            <th>Data de Cadastro</th>
+            <th>Data de Atualização</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
-          {Object.values(data).map((tipos_produtos) => (
-            <tr key={tipos_produtos.id}>
-              <td>{tipos_produtos.id}</td>
-              <td>{tipos_produtos.nome}</td>
-              <td>{tipos_produtos.id_imposto}</td>
+          {Object.values(data).map((produto) => (
+            <tr key={produto.id}>
+              <td>{produto.id}</td>
+              <td>{produto.nome}</td>
+              <td>{produto.preco}</td>
+              <td>{produto.id_tipo_produto}</td>
+              <td>{produto.data_cad}</td>
+              <td>{produto.data_at}</td>
               <td>
-                <Link to={"/tipos-produtos/visualizar/" + tipos_produtos.id}>
+                <Link to={"/produtos/visualizar/" + produto.id}>
                   <ButtonPrimary>Visualizar</ButtonPrimary>
                 </Link>
-                <Link to={"/tipos-produtos/editar/" + tipos_produtos.id}>
+                <Link to={"/produtos/editar/" + produto.id}>
                   <ButtonWarning>Editar</ButtonWarning>
                 </Link>
                 <ButtonDanger
-                  onClick={() => apagarTiposProduto(tipos_produtos.id)}
+                  onClick={() => apagarProduto(produto.id)}
                 >
                   Apagar
                 </ButtonDanger>

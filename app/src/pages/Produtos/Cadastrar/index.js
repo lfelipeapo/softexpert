@@ -20,12 +20,13 @@ import {
 export const Cadastrar = () => {
   const date = new Date().toJSON().slice(0, 10);
 
-  const [tipos_produtos, setTiposProdutos] = useState({
+  const [produtos, setProdutos] = useState({
     id: "",
     nome: "",
-    id_imposto: "",
-    date_cad: date,
-    date_at: null,
+    preco: "",
+    id_tipo_produto: "",
+    data_cad: date,
+    data_at: null,
   });
 
   const [data, setData] = useState([]);
@@ -35,33 +36,36 @@ export const Cadastrar = () => {
     mensagem: "",
   });
 
-  const valorInput = (e) =>
-    setTiposProdutos({ ...tipos_produtos, [e.target.name]: e.target.value });
+  const valorNome = (e) =>
+    setProdutos({ ...produtos, [e.target.name]: e.target.value });
+  
+  const valorPreco = (e) =>
+    setProdutos({ ...produtos, [e.target.name]: e.target.value });
 
   const valorSelect = (e) =>
-    setTiposProdutos({ ...tipos_produtos, [e.target.name]: e.target.value });
+    setProdutos({ ...produtos, [e.target.name]: e.target.value });
 
-  const getImpostos = useCallback(async () => {
-    fetch("http://localhost:8181/impostos")
+  const getTiposProdutos = useCallback(async () => {
+    fetch("http://localhost:8181/tipos-produtos")
       .then((response) => response.json())
       .then((responseJson) => {
         setData(responseJson.records);
-        setTiposProdutos({
-          ...tipos_produtos,
-          id_imposto: responseJson.records[0].id,
+        setProdutos({
+          ...produtos,
+          id_tipo_produto: responseJson.records[0].id,
         });
       });
-  }, [tipos_produtos]);
+  }, [produtos]);
 
-  const cadTiposProdutos = useCallback(
+  const cadProdutos = useCallback(
     async (e) => {
       e.preventDefault();
-      await fetch("http://localhost:8181/tipos-produtos/save", {
+      await fetch("http://localhost:8181/produtos/save", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ tipos_produtos }),
+        body: JSON.stringify({ produtos }),
       })
         .then((response) => response.json())
         .then((responseJson) => {
@@ -75,7 +79,7 @@ export const Cadastrar = () => {
               type: "success",
               mensagem: responseJson.mensagem,
             });
-            getImpostos();
+            getTiposProdutos();
           }
         })
         .catch(() => {
@@ -85,12 +89,12 @@ export const Cadastrar = () => {
           });
         });
     },
-    [getImpostos, tipos_produtos]
+    [getTiposProdutos, produtos]
   );
 
   useEffect(() => {
-    getImpostos();
-  }, [getImpostos]);
+    getTiposProdutos();
+  }, []);
 
   return (
     <Container className="principal">
@@ -98,7 +102,7 @@ export const Cadastrar = () => {
         <ConteudoTitulo>
           <Titulo>Cadastrar</Titulo>
           <BotaoAcao>
-            <Link to="/tipos-produtos">
+            <Link to="/produtos">
               <ButtonInfo>Listar</ButtonInfo>
             </Link>
           </BotaoAcao>
@@ -115,24 +119,32 @@ export const Cadastrar = () => {
           ""
         )}
 
-        <Form onSubmit={cadTiposProdutos}>
-          <Label>Nome do Tipo do Produto: </Label>
+        <Form onSubmit={cadProdutos}>
+          <Label>Nome do Produto: </Label>
           <Input
             type="text"
             name="nome"
-            placeholder="Tipo do Produto"
-            onChange={valorInput}
+            placeholder="Nome do Produto"
+            onChange={valorNome}
           />
 
-          <Label>Imposto: </Label>
+          <Label>Preço: </Label>
+          <Input
+            type="text"
+            name="preco"
+            placeholder="Preço"
+            onChange={valorPreco}
+          />
+
+          <Label>Tipo do Produto: </Label>
           <Select
-            name="id_imposto"
+            name="id_tipo_produto"
             onChange={valorSelect}
-            value={tipos_produtos.id_imposto}
+            value={produtos.id_tipo_produto}
           >
-            {Object.values(data).map((imposto) => (
-              <option key={imposto.id} value={imposto.id}>
-                {imposto.nome}
+            {Object.values(data).map((tipo_produto) => (
+              <option key={tipo_produto.id} value={tipo_produto.id}>
+                {tipo_produto.nome}
               </option>
             ))}
           </Select>

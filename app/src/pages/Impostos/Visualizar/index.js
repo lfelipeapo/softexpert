@@ -30,7 +30,9 @@ export const Visualizar = (props) => {
           </BotaoAcao>
         </ConteudoTitulo>
         <ConteudoImp>ID: {data.id}</ConteudoImp>
+        <hr />
         <ConteudoImp>Nome do Imposto: {data.nome}</ConteudoImp>
+        <hr />
         <ConteudoImp>Percentual: {data.percentual} %</ConteudoImp>
       </Container>
     );

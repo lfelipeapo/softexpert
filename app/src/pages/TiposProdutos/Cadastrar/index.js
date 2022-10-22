@@ -90,7 +90,7 @@ export const Cadastrar = () => {
 
   useEffect(() => {
     getImpostos();
-  }, [getImpostos]);
+  }, []);
 
   return (
     <Container className="principal">

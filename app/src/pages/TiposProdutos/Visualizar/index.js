@@ -36,9 +36,13 @@ export const Visualizar = (props) => {
         </BotaoAcao>
       </ConteudoTitulo>
       <ConteudoTip>ID: {data.id}</ConteudoTip>
+      <hr />
       <ConteudoTip>Nome: {data.nome}</ConteudoTip>
+      <hr />
       <ConteudoTip>ID do Imposto: {data.id_imposto}</ConteudoTip>
+      <hr />
       <ConteudoTip>Data de Cadastro: {data.data_cad}</ConteudoTip>
+      <hr />
       <ConteudoTip>Data de Atualização: {data.data_at}</ConteudoTip>
     </Container>
   );

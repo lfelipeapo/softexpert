@@ -114,12 +114,12 @@ class TiposProdutosDAO extends DAO
         if ($stmt->rowCount() > 0) {
             $response = [
                 "erro" => false,
-                "mensagem" => "Tipo apagado com sucesso!"
+                "mensagem" => "Produto apagado com sucesso!"
             ];
         } else {
             $response = [
                 "erro" => true,
-                "mensagem" => "Erro: Tipo não apagado, tente novamente mais tarde!"
+                "mensagem" => "Erro: Produto não apagado, tente novamente mais tarde!"
             ];
         }
         $utils->encodeResponse($response);
