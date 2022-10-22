@@ -78,6 +78,24 @@ class RequestUtils extends Utils
         $this->encodeResponse($response);
     }
 
+    public function validaEstoque($model)
+    {
+        if ($model and is_array($model->rows)) {
+            $data = [];
+            foreach ($model->rows as $estoque) {
+                $data[] = $estoque;
+            };
+            $response = ['records' => $data];
+        } elseif (!$this->isNil($model->id) and !$this->isNil($model->prod_id) and !$this->isNil($model->estoque_qtde)) {
+            $response = [
+                'erro' => false,
+                'estoque' => $model,
+                "menssagem" => "Encontrado registro"
+            ];
+        }
+        $this->encodeResponse($response);
+    }
+
     public function validaTiposProdutos($model)
     {
         if ($model and is_array($model->rows)) {

@@ -2,11 +2,11 @@
 
 namespace DAO;
 
-use Model\TiposProdutosModel;
+use Model\EstoqueModel;
 use \PDO;
 use Utils\RequestUtils;
 
-class TiposProdutosDAO extends DAO
+class EstoqueDAO extends DAO
 {
     public $rows;
 
@@ -17,15 +17,15 @@ class TiposProdutosDAO extends DAO
 
 
 
-    public function insert(TiposProdutosModel $model)
+    public function insert(EstoqueModel $model)
     {
 
-        $sql = "INSERT INTO tipos_produtos (nome, id_imposto, data_cad, data_at) VALUES (?, ?, ?, ?) ";
+        $sql = "INSERT INTO estoque (prod_id, estoque_qtde, data_cad, data_at) VALUES (?, ?, ?, ?) ";
 
         $stmt = $this->conexao->prepare($sql);
 
-        $stmt->bindValue(1, $model->nome);
-        $stmt->bindValue(2, $model->id_imposto);
+        $stmt->bindValue(1, $model->prod_id);
+        $stmt->bindValue(2, $model->estoque_qtde);
         $stmt->bindValue(3, $model->data_cad);
         $stmt->bindValue(4, $model->data_at);
 
@@ -37,14 +37,14 @@ class TiposProdutosDAO extends DAO
     }
 
 
-    public function update(TiposProdutosModel $model)
+    public function update(EstoqueModel $model)
     {
-        $sql = "UPDATE tipos_produtos SET nome=?, id_imposto=?, data_cad=?, data_at=? WHERE id=?";
+        $sql = "UPDATE estoque SET prod_id=?, estoque_qtde=?, data_cad=?, data_at=? WHERE id=?";
 
         $stmt = $this->conexao->prepare($sql);
 
-        $stmt->bindValue(1, $model->nome);
-        $stmt->bindValue(2, $model->id_imposto);
+        $stmt->bindValue(1, $model->prod_id);
+        $stmt->bindValue(2, $model->estoque_qtde);
         $stmt->bindValue(3, $model->data_cad);
         $stmt->bindValue(4, $model->data_at);
         $stmt->bindValue(5, $model->id);
@@ -58,7 +58,7 @@ class TiposProdutosDAO extends DAO
 
     public function selectAll()
     {
-        $sql = "SELECT * FROM tipos_produtos ";
+        $sql = "SELECT * FROM estoque ";
 
         $stmt = $this->conexao->prepare($sql);
         $stmt->execute();
@@ -79,14 +79,14 @@ class TiposProdutosDAO extends DAO
 
     public function selectById(int $id)
     {
-        $sql = "SELECT * FROM tipos_produtos WHERE id = ? ";
+        $sql = "SELECT * FROM estoque WHERE id = ? ";
 
         $stmt = $this->conexao->prepare($sql);
         $stmt->bindValue(1, $id);
         $stmt->execute();
 
         if ($stmt->rowCount() > 0) {
-            return $stmt->fetchObject("Model\TiposProdutosModel");
+            return $stmt->fetchObject("Model\EstoqueModel");
         } else {
             $response = [
                 "erro" => true,
@@ -103,7 +103,7 @@ class TiposProdutosDAO extends DAO
 
         $utils = new RequestUtils;
 
-        $sql = "DELETE FROM tipos_produtos WHERE id = ? ";
+        $sql = "DELETE FROM estoque WHERE id = ? ";
         $stmt = $this->conexao->prepare($sql);
         $stmt->bindValue(1, $id);
 
@@ -114,12 +114,12 @@ class TiposProdutosDAO extends DAO
         if ($stmt->rowCount() > 0) {
             $response = [
                 "erro" => false,
-                "mensagem" => "Tipo apagado com sucesso!"
+                "mensagem" => "Estoque apagado com sucesso!"
             ];
         } else {
             $response = [
                 "erro" => true,
-                "mensagem" => "Erro: Tipo não apagado, tente novamente mais tarde!"
+                "mensagem" => "Erro: Estoque não apagado, tente novamente mais tarde!"
             ];
         }
         $utils->encodeResponse($response);

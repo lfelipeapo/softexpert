@@ -1,6 +1,7 @@
 <?php
 
 use Controller\ClienteController;
+use Controller\EstoqueController;
 use Controller\ImpostoController;
 use Controller\Pages\Home;
 use Controller\ProdutosController;
@@ -97,6 +98,28 @@ switch (URL) {
     case PATH[1] === 'produtos' and PATH[2] === 'delete' and is_numeric(PATH[3]):
         $id = PATH[3];
         ProdutosController::delete($id);
+        break;
+
+    case PATH[1] === 'estoque' and !isset(PATH[2]):
+        EstoqueController::listAll();
+        break;
+
+    case PATH[1] === 'estoque' and is_numeric(PATH[2]):
+        $id = PATH[2];
+        EstoqueController::listId($id);
+        break;
+
+    case PATH[1] === 'estoque' and PATH[2] === 'save':
+        EstoqueController::save();
+        break;
+
+    case PATH[1] === 'estoque' and PATH[2] === 'update':
+        EstoqueController::update();
+        break;
+
+    case PATH[1] === 'estoque' and PATH[2] === 'delete' and is_numeric(PATH[3]):
+        $id = PATH[3];
+        EstoqueController::delete($id);
         break;
 
     default:
