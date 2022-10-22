@@ -3,6 +3,7 @@
 use Controller\ClienteController;
 use Controller\ImpostoController;
 use Controller\Pages\Home;
+use Controller\ProdutosController;
 use Controller\TiposProdutosController;
 
 switch (URL) {
@@ -74,6 +75,28 @@ switch (URL) {
     case PATH[1] === 'tipos-produtos' and PATH[2] === 'delete' and is_numeric(PATH[3]):
         $id = PATH[3];
         TiposProdutosController::delete($id);
+        break;
+
+    case PATH[1] === 'produtos' and !isset(PATH[2]):
+        ProdutosController::listAll();
+        break;
+
+    case PATH[1] === 'produtos' and is_numeric(PATH[2]):
+        $id = PATH[2];
+        ProdutosController::listId($id);
+        break;
+
+    case PATH[1] === 'produtos' and PATH[2] === 'save':
+        ProdutosController::save();
+        break;
+
+    case PATH[1] === 'produtos' and PATH[2] === 'update':
+        ProdutosController::update();
+        break;
+
+    case PATH[1] === 'produtos' and PATH[2] === 'delete' and is_numeric(PATH[3]):
+        $id = PATH[3];
+        ProdutosController::delete($id);
         break;
 
     default:
