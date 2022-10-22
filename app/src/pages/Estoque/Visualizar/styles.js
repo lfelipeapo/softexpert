@@ -35,7 +35,7 @@ export const Titulo = styled.h1`
     font-size: 23px;
 `;
 
-export const ConteudoImp = styled.p`
+export const ConteudoTip = styled.p`
     color: #3e3e3e;
     font-size: 16px;
 `;

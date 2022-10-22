@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import {
@@ -13,43 +13,50 @@ import {
   Form,
   Label,
   Input,
-  ButtonWarning,
+  ButtonSuccess,
+  Select,
 } from "./styles";
 
 export const Editar = (props) => {
+  const date = new Date().toJSON().slice(0, 10);
   const id = props.match.params.id;
-  const [imposto, setImposto] = useState({
-    imposto: {
-      id: id,
-      percentual: "",
-    },
+  const [tipos_produtos, setTiposProdutos] = useState({
+    id: id,
+    nome: "",
+    id_imposto: "",
+    date_cad: "",
+    date_at: "",
   });
+
+  const [data, setData] = useState([]);
 
   const [status, setStatus] = useState({
     type: "",
     mensagem: "",
   });
 
-  const valorInput = (e) => {
-    let nameInput = e.target.name;
-    let value = e.target.value;
-    setImposto({
-      imposto: {
-        id: id,
-        [nameInput]: value,
-      },
-    });
-  };
+  const valorInput = (e) =>
+    setTiposProdutos({ ...tipos_produtos, [e.target.name]: e.target.value });
 
-  const editImposto = async (e) => {
+  const valorSelect = (e) =>
+    setTiposProdutos({ ...tipos_produtos, [e.target.name]: e.target.value });
+
+  const getImpostos = useCallback(async () => {
+    fetch("http://localhost:8181/impostos")
+      .then((response) => response.json())
+      .then((responseJson) => {
+        setData(responseJson.records);
+      });
+  }, []);
+
+  const edTiposProdutos = async (e) => {
     e.preventDefault();
-
-    await fetch("http://localhost:8181/impostos/update", {
+    await fetch("http://localhost:8181/tipos-produtos/update", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(imposto),
+      body: JSON.stringify({ tipos_produtos: tipos_produtos }),
     })
       .then((response) => response.json())
       .then((responseJson) => {
@@ -63,73 +70,86 @@ export const Editar = (props) => {
             type: "success",
             mensagem: responseJson.mensagem,
           });
+          getImpostos();
         }
       })
       .catch(() => {
         setStatus({
           type: "erro",
-          mensagem: "Imposto não editado, tente mais tarde!",
+          mensagem: "Tipo não cadastro com sucesso, tente mais tarde!",
         });
       });
   };
 
-  useEffect(() => {
-    const getImposto = async () => {
-      await fetch("http://localhost:8181/impostos/" + id)
-        .then((response) => response.json())
-        .then((responseJson) => {
-          setImposto({
-            imposto: {
-              percentual: responseJson.imposto.percentual,
-            },
-          });
+  const getTiposProduto = useCallback(async () => {
+    await fetch("http://localhost:8181/tipos-produtos/" + id)
+      .then((response) => response.json())
+      .then((responseJson) => {
+        setTiposProdutos({
+          id: id,
+          nome: responseJson.tipos_produtos.nome,
+          id_imposto: responseJson.tipos_produtos.id_imposto,
+          data_cad: responseJson.tipos_produtos.data_cad,
+          data_at: date,
         });
-    };
-    getImposto();
-  }, [id]);
+      });
+  }, [date, id]);
 
-return (
-  <Container className="principal">
-    <ConteudoForm>
-      <ConteudoTitulo>
-        <Titulo>Editar</Titulo>
-        <BotaoAcao>
-          <Link to="/impostos">
-            <ButtonInfo>Listar</ButtonInfo>
-          </Link>
-        </BotaoAcao>
-      </ConteudoTitulo>
+  console.log(tipos_produtos);
 
-      {status.type === "erro" ? (
-        <AlertDanger>{status.mensagem}</AlertDanger>
-      ) : (
-        ""
-      )}
-      {status.type === "success" ? (
-        <AlertSuccess>{status.mensagem}</AlertSuccess>
-      ) : (
-        ""
-      )}
+  useEffect(getTiposProduto, [id, date, getTiposProduto]);
 
-      {imposto && (
-        <Form onSubmit={editImposto}>
-          <Label>Percentual: </Label>
+  useEffect(getImpostos, [getImpostos]);
+
+  return (
+    <Container className="principal">
+      <ConteudoForm>
+        <ConteudoTitulo>
+          <Titulo>Editar</Titulo>
+          <BotaoAcao>
+            <Link to="/tipos-produtos">
+              <ButtonInfo>Listar</ButtonInfo>
+            </Link>
+          </BotaoAcao>
+        </ConteudoTitulo>
+
+        {status.type === "erro" ? (
+          <AlertDanger>{status.mensagem}</AlertDanger>
+        ) : (
+          ""
+        )}
+        {status.type === "success" ? (
+          <AlertSuccess>{status.mensagem}</AlertSuccess>
+        ) : (
+          ""
+        )}
+
+        <Form onSubmit={edTiposProdutos}>
+          <Label>Nome do Tipo do Produto: </Label>
           <Input
-            disabled={status.type.erro}
             type="text"
-            name="percentual"
-            placeholder="Percentual do Imposto"
-            value={
-              imposto.imposto?.percentual ? imposto.imposto?.percentual : ""
-            }
+            name="nome"
+            value={tipos_produtos.nome}
+            placeholder="Tipo do Produto"
             onChange={valorInput}
           />
 
-          <ButtonWarning type="submit">Editar</ButtonWarning>
+          <Label>Imposto: </Label>
+          <Select
+            name="id_imposto"
+            onChange={valorSelect}
+            value={tipos_produtos.id_imposto}
+          >
+            {Object.values(data).map((imposto) => (
+              <option key={imposto.id} value={imposto.id}>
+                {imposto.nome}
+              </option>
+            ))}
+          </Select>
+
+          <ButtonSuccess type="submit">Editar</ButtonSuccess>
         </Form>
-      )}
-    </ConteudoForm>
-  </Container>
-);
-  
+      </ConteudoForm>
+    </Container>
+  );
 };

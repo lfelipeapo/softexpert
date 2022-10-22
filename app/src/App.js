@@ -6,6 +6,10 @@ import { Home as Clientes } from "./pages/Clientes/Home";
 import { Cadastrar as ClienteCad } from "./pages/Clientes/Cadastrar";
 import { Visualizar as ClienteVisualizar } from "./pages/Clientes/Visualizar";
 import { Editar as ClienteEditar } from "./pages/Clientes/Editar";
+import { Home as Estoque } from "./pages/Estoque/Home";
+import { Cadastrar as EstoqueCad } from "./pages/Estoque/Cadastrar";
+import { Visualizar as EstoqueVisualizar } from "./pages/Estoques/Visualizar";
+import { Editar as EstoqueEditar } from "./pages/Estoques/Editar";
 import { Home as Impostos } from "./pages/Impostos/Home";
 import { Cadastrar as ImpostoCad } from "./pages/Impostos/Cadastrar";
 import { Visualizar as ImpostoVisualizar } from "./pages/Impostos/Visualizar";
@@ -26,8 +30,9 @@ function App() {
       <Router>
         <Switch>
           <Route exact path="/" component={BemVindo} />
-          <Route exact path="/impostos" component={Impostos} />
           <Route exact path="/clientes" component={Clientes} />
+          <Route exact path="/estoque" component={Estoque} />
+          <Route exact path="/impostos" component={Impostos} />
           <Route exact path="/tipos-produtos" component={TiposProdutos} />
           <Route exact path="/produtos" component={Produtos} />
           <Route path="/clientes/cadastrar" component={ClienteCad} />
@@ -36,6 +41,12 @@ function App() {
             component={ClienteVisualizar}
           />
           <Route path="/clientes/editar/:id" component={ClienteEditar} />
+          <Route path="/estoque/cadastrar" component={EstoqueCad} />
+          <Route
+            path="/estoque/visualizar/:id"
+            component={EstoqueVisualizar}
+          />
+          <Route path="/estoque/editar/:id" component={EstoqueEditar} />
           <Route path="/impostos/cadastrar" component={ImpostoCad} />
           <Route
             path="/impostos/visualizar/:id"

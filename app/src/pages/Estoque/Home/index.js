@@ -1,3 +1,4 @@
+import { isNil } from "lodash";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
@@ -23,15 +24,18 @@ export const Home = () => {
     mensagem: "",
   });
 
-  const getImpostos = async () => {
-    fetch("http://localhost:8181/impostos")
+   const formatData = (dataSql) => {
+     if (!isNil(dataSql)) return dataSql.split("-").reverse().join("/");
+   };
+
+  const getEstoque = async () => {
+    fetch("http://localhost:8181/estoque")
       .then((response) => response.json())
       .then((responseJson) => setData(responseJson.records));
   };
 
-  const apagarImposto = async (idImposto) => {
-    //console.log(idImposto);
-    await fetch("http://localhost:8181/impostos/delete/" + idImposto)
+  const apagarEstoque = async (idEstoque) => {
+    await fetch("http://localhost:8181/estoque/delete/" + idEstoque, {method: "DELETE"})
       .then((response) => response.json())
       .then((responseJson) => {
         if (responseJson.erro) {
@@ -44,19 +48,19 @@ export const Home = () => {
             type: "success",
             mensagem: responseJson.mensagem,
           });
-          getImpostos();
+          getEstoque();
         }
       })
       .catch(() => {
         setStatus({
           type: "erro",
-          mensagem: "Erro: Imposto não apagado, tente mais tarde",
+          mensagem: "Erro: Estoque não apagado, tente mais tarde",
         });
       });
   };
 
   useEffect(() => {
-    getImpostos();
+    getEstoque();
   }, []);
 
   return (
@@ -64,7 +68,7 @@ export const Home = () => {
       <ConteudoTitulo>
         <Titulo>Listar</Titulo>
         <BotaoAcao>
-          <Link to="/impostos/cadastrar">
+          <Link to="/estoque/cadastrar">
             <ButtonSuccess>Cadastrar</ButtonSuccess>
           </Link>
         </BotaoAcao>
@@ -85,23 +89,31 @@ export const Home = () => {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Percentual</th>
+            <th>Produto ID</th>
+            <th>Quantidade</th>
+            <th>Data do Cadastro</th>
+            <th>Data da Atualização</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
-          {Object.values(data).map((imposto) => (
-            <tr key={imposto.id}>
-              <td>{imposto.id}</td>
-              <td>{imposto.percentual}%</td>
+          {Object.values(data).map((estoque) => (
+            <tr key={estoque.id}>
+              <td>{estoque.id}</td>
+              <td>{estoque.prod_id}</td>
+              <td>{estoque.estoque_qtde}</td>
+              <td>{formatData(estoque.data_cad)}</td>
+              <td>{formatData(estoque.data_at)}</td>
               <td>
-                <Link to={"/impostos/visualizar/" + imposto.id}>
+                <Link to={"/estoque/visualizar/" + estoque.id}>
                   <ButtonPrimary>Visualizar</ButtonPrimary>
                 </Link>
-                <Link to={"/impostos/editar/" + imposto.id}>
+                <Link to={"/estoque/editar/" + estoque.id}>
                   <ButtonWarning>Editar</ButtonWarning>
                 </Link>
-                <ButtonDanger onClick={() => apagarImposto(imposto.id)}>
+                <ButtonDanger
+                  onClick={() => apagarEstoque(estoque.id)}
+                >
                   Apagar
                 </ButtonDanger>
               </td>
