@@ -5,6 +5,7 @@ use Controller\EstoqueController;
 use Controller\GenericsController;
 use Controller\ImpostoController;
 use Controller\Pages\Home;
+use Controller\PedidosController;
 use Controller\ProdutosController;
 use Controller\TiposProdutosController;
 
@@ -137,7 +138,7 @@ switch (URL) {
         break;
 
     case PATH[1] === 'pedidos' and PATH[2] === 'save':
-        PedidosController::savePedidos();
+        PedidosController::save();
         break;
 
     case PATH[1] === 'pedidos' and PATH[2] === 'delete' and is_numeric(PATH[3]):
@@ -147,17 +148,7 @@ switch (URL) {
 
     case PATH[1] === 'pedidos' and is_numeric(PATH[2]) and PATH[3] === 'itens' and !isset(PATH[4]):
         $ped_id = PATH[2];
-        PedidosController::listByPedId($id);
-        break;
-
-    case PATH[1] === 'pedidos' and is_numeric(PATH[2]) and PATH[3] === 'itens' and PATH[4] === 'save':
-        $ped_id = PATH[2];
-        PedidosController::saveItens();
-        break;
-
-    case PATH[1] === 'pedidos' and is_numeric(PATH[2]) and PATH[3] === 'itens' and PATH[4] === 'delete':
-        $ped_id = PATH[2];
-        PedidosController::deleteItensByPed($id);
+        PedidosController::listItens($id);
         break;
 
     default:

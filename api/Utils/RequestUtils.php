@@ -131,6 +131,36 @@ class RequestUtils extends Utils
         $this->encodeResponse($response);
     }
 
+    public function validaPedidos($model)
+    {
+        if ($model and is_array($model->rows)) {
+            $data = [];
+            foreach ($model->rows as $pedidos) {
+                $data[] = $pedidos;
+            };
+            $response = ['records' => $data];
+        } elseif (!$this->isNil($model->id) and !$this->isNil($model->cli_id) and !$this->isNil($model->ped_valor) and !$this->isNil($model->ped_qtde)) {
+            $response = [
+                'erro' => false,
+                'pedidos' => $model,
+                "menssagem" => "Encontrado registro"
+            ];
+        }
+        $this->encodeResponse($response);
+    }
+
+    public function validaItensPedidos($model)
+    {
+        if ($model and is_array($model->rows)) {
+            $data = [];
+            foreach ($model->rows as $itens_pedido) {
+                $data[] = $itens_pedido;
+            };
+            $response = ['records' => $data];
+        }
+        $this->encodeResponse($response);
+    }
+
     public function validaCliente($model)
     {
         if ($model and is_array($model->rows)) {

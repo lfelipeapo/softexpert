@@ -21,7 +21,7 @@ import {
   TotalAmount,
   TotalLabel,
   Totals,
-  ProdutoID,
+  ProdutoImp,
   CartRowQuant,
   NoneList,
   ElemList,
@@ -144,7 +144,8 @@ const Carrinho = () => {
                 <CartRowDesc>
                   <ProdutoTitulo>Gabinete Gamer</ProdutoTitulo>
 
-                  <ProdutoID>#41345755</ProdutoID>
+                  <ProdutoImp>Imposto por Item</ProdutoImp>
+                  <ProdutoImp>R$1,59</ProdutoImp>
                 </CartRowDesc>
 
                 <CartRowQuant>
@@ -176,7 +177,8 @@ const Carrinho = () => {
                 <CartRowDesc>
                   <ProdutoTitulo>Gabinete Gamer</ProdutoTitulo>
 
-                  <ProdutoID>#41345755</ProdutoID>
+                  <ProdutoImp>Imposto por Item</ProdutoImp>
+                  <ProdutoImp>R$1,59</ProdutoImp>
                 </CartRowDesc>
 
                 <CartRowQuant>
@@ -207,8 +209,8 @@ const Carrinho = () => {
 
                 <CartRowDesc>
                   <ProdutoTitulo>Gabinete Gamer</ProdutoTitulo>
-
-                  <ProdutoID>#41345755</ProdutoID>
+                  <ProdutoImp>Imposto por Item</ProdutoImp>
+                  <ProdutoImp>R$1,59</ProdutoImp>
                 </CartRowDesc>
 
                 <CartRowQuant>
@@ -240,13 +242,13 @@ const Carrinho = () => {
             </Totals>
 
             <Totals>
-              <TotalLabel>Taxa</TotalLabel>
+              <TotalLabel>Total de Imposto do Pedido</TotalLabel>
 
               <TotalAmount>R$2,00</TotalAmount>
             </Totals>
 
             <Totals>
-              <TotalLabel>Total</TotalLabel>
+              <TotalLabel>Total da Compra</TotalLabel>
 
               <TotalAmount>R$15,87</TotalAmount>
             </Totals>

@@ -112,10 +112,10 @@ export const ProdutoTitulo = styled.h5`
   margin: 10px 0 0;
 `;
 
-export const ProdutoID = styled.p`
+export const ProdutoImp = styled.p`
   margin: 5px 0 0;
-
   font-size: 0.75em;
+  font-weight: 400;
 `;
 
 export const CartRowQuant = styled.div`
