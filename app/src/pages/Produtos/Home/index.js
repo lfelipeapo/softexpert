@@ -65,7 +65,7 @@ export const Home = () => {
       .catch(() => {
         setStatus({
           type: "erro",
-          mensagem: "Erro: Tipo não apagado, tente mais tarde",
+          mensagem: "Erro: Produto não apagado, tente mais tarde",
         });
       });
   };
