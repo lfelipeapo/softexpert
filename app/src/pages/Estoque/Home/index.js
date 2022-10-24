@@ -38,7 +38,7 @@ export const Home = () => {
     await fetch("http://localhost:8181/estoque/delete/" + idEstoque, {method: "DELETE"})
       .then((response) => response.json())
       .then((responseJson) => {
-        if (responseJson.erro) {
+        if (responseJson && responseJson.erro) {
           setStatus({
             type: "erro",
             mensagem: responseJson.mensagem,
