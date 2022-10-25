@@ -36,6 +36,7 @@ import {
 export const Carrinho = () => {
   const date = new Date().toJSON().slice(0, 10);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasClientes, setHasClientes] = useState(false);
 
   const [produtos, setProdutos] = useState([]);
   const [itensCart, setItensCart] = useState([]);
@@ -50,9 +51,9 @@ export const Carrinho = () => {
   const [pedido, setPedido] = useState({
     itens: [],
     clid_id: "",
-    ped_subtotal: "",
-    ped_imposto: "",
-    ped_valor: "",
+    ped_subtotal: 0,
+    ped_imposto: 0,
+    ped_valor: 0,
     ped_qtde: 0,
     data_ped: "",
     data_pg: "",
@@ -289,6 +290,7 @@ export const Carrinho = () => {
           setClientes(responseJson.records);
         }
       })
+      .finally(() => { setHasClientes(true); })
       .catch(() => {
         setStatus({
           type: "erro",
@@ -475,24 +477,31 @@ export const Carrinho = () => {
               </Footer>
             </CartContainer>
           </Container>
-          <Box>
-            <Titulo>Selecione o seu nome abaixo:</Titulo>
-            <Label>Nome do cadastro do cliente: </Label>
-            <Select
-              name="cli_id"
-              onChange={valorSelect}
-              value={clientes.cli_id}
-            >
-              {Object.values(clientes).map((cliente) => (
-                <option key={cliente.id} value={cliente.id}>
-                  {cliente.cli_nome}
-                </option>
-              ))}
-            </Select>
-            <ButtonFinal onClick={() => preparaPedido(itensCart)}>
-              Finalizar Compra
-            </ButtonFinal>
-          </Box>
+
+          {hasClientes ? (
+            <Box>
+              <Titulo>Selecione o seu nome abaixo:</Titulo>
+              <Label>Nome do cadastro do cliente: </Label>
+              <Select
+                name="cli_id"
+                onChange={valorSelect}
+                value={clientes.cli_id}
+              >
+                {Object.values(clientes).map((cliente) => (
+                  <option key={cliente.id} value={cliente.id}>
+                    {cliente.cli_nome}
+                  </option>
+                ))}
+              </Select>
+              <ButtonFinal onClick={() => preparaPedido(itensCart)}>
+                Finalizar Compra
+              </ButtonFinal>
+            </Box>
+          ) : (
+            <AlertDanger>
+              Sem cadastro de clientes encontrado, por favor adicione um para finalizar a compra.
+            </AlertDanger>
+          )}
         </Container>
       </Body>
     </>
