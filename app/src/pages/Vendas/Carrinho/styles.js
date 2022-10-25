@@ -1,17 +1,35 @@
 import styled from "styled-components";
 
 export const Body = styled.div`
+  column-gap: 200px;
+  row-gap: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
-
   margin: 0 auto;
-
   padding: 0;
-
-  background-color: transparent;
-
   font-family: "Raleway", sans-serif;
+  section:nth-of-type(2) {
+    min-height: fit-content;
+    margin: 0;
+    padding: 0;
+    gap: 40px;
+    section:nth-of-type(2) {
+      padding: 30px;
+      transform: translateY(calc(-25% - 20px));
+      font-size: 1.75rem;
+      gap: calc(100% + 30px);
+      justify-content: flex-start;
+      align-self: flex-end;
+      margin: 0 auto;
+      color: whitesmoke;
+      select {
+        color: #006cb5;
+        background-color: transparent;
+        font-size: 1.75rem;
+      }
+    }
+  }
 `;
 
 export const Container = styled.section`
@@ -24,9 +42,45 @@ export const Container = styled.section`
   padding: 0px 20px 20px;
 `;
 
-export const CartContainer = styled.div`
+export const Box = styled.section`
+  box-shadow: 0 5px 20px rgb(120 120 120);
+  background-color: #ccc;
   border-radius: 8px;
-  box-shadow: 0 5px 20px rgb(120, 120, 120);
+  width: 300px;
+  height: 100%;
+  margin: 50px auto;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  text-align: right;
+  flex-direction: column;
+  min-height: 600px;
+  padding: 0px 20px 20px;
+
+  h3 {
+    color: darkslategray;
+  }
+
+  label {
+    color: darkslategray;
+  }
+
+  button {
+    margin: 12px 12px 0 0;
+    align-self: flex-end;
+  }
+`;
+
+export const CartContainer = styled.div`
+  font-size: 1.75rem;
+  gap: calc(100% + 10px);
+  margin: 0 auto;
+  width: fit-content;
+  border-radius: 8px;
+  box-shadow: 0 5px 20px rgb(130 130 130);
+  p {
+    margin: 0;
+  }
 `;
 
 export const CartBody = styled.div`
@@ -34,13 +88,15 @@ export const CartBody = styled.div`
 `;
 
 export const CartItem = styled.div`
-  padding: 15px 20px 0 20px;
+  padding: 40px 20px 40px 20px;
 `;
 
 export const CartRow = styled.div`
   display: flex;
-
+  align-items: center;
+  gap: 15px;
   padding: 15px 0;
+  font-size: 1.50rem;
 
   flex-direction: row;
 
@@ -52,8 +108,9 @@ export const CartRow = styled.div`
 `;
 
 export const CartRowCellPic = styled.div`
-  height: 50px;
-
+  height: 30px;
+  margin: 10px 0;
+  cursor: pointer;
   flex: 1;
 
   position: relative;
@@ -100,21 +157,23 @@ export const Badge = styled.span`
 
   background-size: contain;
 
-  background-image: url(https://i0.wp.com/techwek.com/wp-content/uploads/2020/12/Imagem-para-perfil.jpg?resize=512%2C473&ssl=1);
+  background-image: url(\assets\images\remove-item-cart.png);
 `;
 
 export const CartRowDesc = styled.div`
-  height: 50px;
-  flex: 3;
+  height: 60px;
+  flex: 6;
 `;
 
 export const ProdutoTitulo = styled.h5`
-  margin: 10px 0 0;
+  margin: 0;
+  font-size: 1rem;
 `;
 
 export const ProdutoImp = styled.p`
-  margin: 5px 0 0;
-  font-size: 0.75em;
+  padding-bottom: 2px;
+  margin: 0;
+  font-size: 0.5em;
   font-weight: 400;
 `;
 
@@ -124,6 +183,15 @@ export const CartRowQuant = styled.div`
 `;
 
 export const NoneList = styled.ul`
+  font-size: 0.75em;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  list-style: none;
+  align-content: center;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
   list-style: none;
 `;
 
@@ -136,6 +204,7 @@ export const ElemList = styled.li`
 `;
 
 export const ListLink = styled.a`
+  cursor: pointer;
   color: #000;
   text-decoration: none;
 `;
@@ -150,6 +219,7 @@ export const CartRowCell = styled.div`
 `;
 
 export const Valores = styled.p`
+  
   margin: 23px 0 0 0;
 `;
 
@@ -164,8 +234,11 @@ export const Totals = styled.div`
 `;
 
 export const TotalLabel = styled.p`
+  font-size: 1.5rem;
   flex: 1;
   text-align: left;
+  border-bottom: #dadada 1px solid;
+  padding-bottom: 1rem;
 `;
 
 export const TotalAmount = styled.p`
@@ -185,7 +258,7 @@ export const Header = styled.header`
 `;
 
 export const Footer = styled.footer`
-  padding: 20px;
+  padding: 30px;
 
   text-align: center;
 
@@ -197,6 +270,7 @@ export const Footer = styled.footer`
 `;
 
 export const ButtonFinal = styled.button`
+  margin: 15px 0;
   cursor: pointer;
   color: #fff;
   border: none;

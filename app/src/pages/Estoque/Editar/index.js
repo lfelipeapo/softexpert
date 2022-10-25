@@ -71,6 +71,8 @@ export const Editar = (props) => {
             mensagem: responseJson.mensagem,
           });
           getProdutos();
+          const form = document.getElementById('form');
+          return form.reset;
         }
       })
       .catch(() => {
@@ -122,7 +124,7 @@ export const Editar = (props) => {
           ""
         )}
 
-        <Form onSubmit={edEstoque}>
+        <Form id="form" onSubmit={edEstoque}>
           <Label>Produto: </Label>
           <Select name="prod_id" onChange={valorSelect} value={estoque.prod_id}>
             {Object.values(data).map((produto) => (

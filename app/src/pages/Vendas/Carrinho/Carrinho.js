@@ -1,6 +1,6 @@
-import { isEmpty, isNil } from "lodash";
+import { isEmpty, isNil, isNumber } from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
-import { Form } from "../../Estoque/Editar/styles";
+import { ConteudoForm, Form, Label, Select } from "../../Estoque/Editar/styles";
 import { Table } from "../../Produtos/Home/styles";
 import {
   Badge,
@@ -30,6 +30,7 @@ import {
   Valores,
   AlertSuccess,
   AlertDanger,
+  Box,
 } from "./styles";
 
 export const Carrinho = () => {
@@ -49,6 +50,7 @@ export const Carrinho = () => {
   const [pedido, setPedido] = useState({
     itens: [],
     clid_id: "",
+    ped_subtotal: "",
     ped_imposto: "",
     ped_valor: "",
     ped_qtde: 0,
@@ -56,107 +58,150 @@ export const Carrinho = () => {
     data_pg: "",
   });
 
-  function addProducToCart(id) {
+  const valorSelect = (e) =>
+    setClientes({ ...clientes, [e.target.name]: e.target.value });
+
+  const addProducToCart = (id) => {
+    let produtos_estoque = [...produtos];
     const copyItensCart = [...itensCart];
-    const produtos = [...produtos];
-
-    const estoque_qtde = produtos.find((produto) => {
-      return produto.id === id;
-    }).estoque_qtde;
-    const item = copyItensCart.find((produto) => produto.id === id);
-    const imposto = calcImpostoPorProd(item.preco, 1);
-
-    if (!item) {
-      copyItensCart.push({
-        estoque_id: item.estoque_id,
-        id: id,
-        qtd: 1,
-        nome: item.nome,
-        preco: item.preco,
-        imposto: imposto,
-        item_total: item.preco * 1 + imposto,
-      });
-      estoque_qtde -= 1;
-    } else {
-      item.qtd = item.qtd + 1;
-      item.imposto = imposto * item.qtd;
-      item.total = item.imposto + item.preco * item.qtd;
-      estoque_qtde -= 1;
+    let estoque = produtos_estoque?.find((x) => x?.id === id);
+    const item = copyItensCart?.find((x) => x?.id === id);
+    let imposto_produto = calcImpostoPorProd(
+      estoque.preco,
+      estoque.percentual_imposto_tipo
+    );
+    if (id && estoque && estoque.estoque_qtde !== 0) {
+      if (isEmpty(itensCart) || !item) {
+        copyItensCart.push({
+          estoque_id: estoque.estoque_id,
+          id: id,
+          qtd: 1,
+          nome: estoque.nome,
+          preco: parseFloat(estoque.preco),
+          imposto: imposto_produto,
+          total: estoque.preco * 1 + imposto_produto,
+        });
+        estoque.estoque_qtde--;
+      } else {
+        item.qtd = item.qtd + 1;
+        item.imposto = imposto_produto * item.qtd;
+        item.total = item.imposto + item.preco * item.qtd;
+        estoque.estoque_qtde--;
+      }
     }
-    const novo_estoque = ({ prev }) => ({
-      estoque: {
-        id: item.estoque_id,
-        prod_id: item.id,
-        estoque_qtde: estoque_qtde,
-        ...prev,
-        data_at: date,
-      },
-    });
-
-    edEstoque(novo_estoque);
+    // const novo_estoque = {
+    //   id: estoque?.estoque_id ? estoque?.estoque_id : item?.estoque_id,
+    //   prod_id: estoque?.id ? estoque?.id : item?.id,
+    //   estoque_qtde: estoque?.estoque_qtde,
+    //   data_cad: null,
+    //   data_at: date,
+    // };
+    setProdutos(produtos_estoque);
     setItensCart(copyItensCart);
-  }
+  };
 
-  function removeProductToCart(id) {
-    const copyItensCart = [...itensCart];
-    const produtos = [...produtos];
-
-    const estoque = produtos.find((produto) => {
-      return produto.id === id;
-    });
-
-    const item = copyItensCart.find((produto) => produto.id === id);
-
-    if (item && item.qtd > 1) {
-      item.qtd = item.qtd - 1;
-      setItensCart(copyItensCart);
-      estoque.estoque_qtde += 1;
-    } else {
-      const arrayFiltered = copyItensCart.filter(
-        (produto) => produto.id !== id
+  const removeProductToCart = (id) => {
+    if (id && itensCart && produtos) {
+      const produtos_estoque = [...produtos];
+      const copyItensCart = [...itensCart];
+      const item = copyItensCart.find((produto) => produto.id === id);
+      let estoque = produtos_estoque.find((produto) => produto.id === id);
+      let imposto_produto = calcImpostoPorProd(
+        estoque.preco,
+        estoque.percentual_imposto_tipo
       );
-      setItensCart(arrayFiltered);
-      estoque.estoque_qtde += 1;
+      if (item) {
+        console.log("entrou");
+        if (
+          !isNil(estoque.estoque_qtde) &&
+          !isNil(item.qtd) &&
+          item.qtd !== 0
+        ) {
+          console.log("aqui");
+          console.log(item.qtd);
+          if (
+            item.qtd > 1 &&
+            !isNil(imposto_produto) &&
+            isNumber(imposto_produto)
+          ) {
+            console.log("quantidade maior que 1");
+            console.table(item);
+            estoque.estoque_qtde++;
+            item.qtd--;
+            item.imposto = imposto_produto * item.qtd;
+            item.total -= item.imposto + item.preco;
+            setItensCart(copyItensCart);
+          } else if (item.qtd == 1) {
+            estoque.estoque_qtde++;
+            const arrayFiltered = copyItensCart.filter(
+              (produto) => produto.id !== id
+            );
+            setItensCart(arrayFiltered);
+          }
+          setProdutos(produtos_estoque);
+        }
+      }
+      // const novo_estoque = {
+      //   id: estoque.estoque_id,
+      //   prod_id: estoque.id,
+      //   estoque_qtde: estoque.estoque_qtde,
+      //   data_cad: null,
+      //   data_at: date,
+      // };
     }
-    const novo_estoque = ({ prev }) => ({
-      estoque: {
-        id: estoque.estoque_id,
-        prod_id: estoque.id,
-        estoque_qtde: estoque_qtde,
-        ...prev,
-        data_at: date,
-      },
-    });
+  };
 
-    edEstoque(novo_estoque);
-  }
-
-  function clearItem(id) {
+  const clearItem = (id) => {
     const estoque = [...produtos];
-    const item = itensCart.find((item) => item.id === id);
     const produto = estoque.find((produto) => produto.id === id);
-    produto.estoque_qtde += item.qtd;
-    const index = itensCart.findIndex(item);
-    setItensCart((itensCart.item[index] = null));
-    const novo_estoque = ({ prev }) => ({
-      estoque: {
-        id: produto.estoque_id,
-        prod_id: produto.id,
-        estoque_qtde: produto.estoque_qtde,
-        ...prev,
-        data_at: date,
-      },
-    });
 
-    edEstoque(novo_estoque);
-  }
+    if (itensCart) {
+      const copyItensCart = [...itensCart];
+      const item = copyItensCart.find((item) => item.id === id);
+      if (
+        itensCart &&
+        item &&
+        !isEmpty(itensCart) &&
+        !isEmpty(item) &&
+        item.qtd !== 0 &&
+        !isNil(item.qtd) &&
+        !isNil(produto.estoque_qtde)
+      ) {
+        const arrayFiltered = copyItensCart.filter((item) => item.id !== id);
+        setItensCart(arrayFiltered);
+        console.log(produto.estoque_qtde);
+        produto.estoque_qtde += item.qtd;
+        const novo_estoque = {
+          id: produto.estoque_id,
+          prod_id: produto.id,
+          estoque_qtde: produto.estoque_qtde,
+          data_at: date,
+        };
+      }
+    }
+  };
+
+  const preparaPedido = (itens) => {
+    if (itens && !isEmpty(itens)) {
+      if (clientes && !isEmpty(clientes)) {
+      } else {
+        return alert("Por favor faça um cadastro e tente novamente!");
+        window.location("/clientes/cadastrar");
+      }
+    } else {
+      return alert(
+        "Não é permitido finalizar um pedido sem itens, por favor, faça o pedido e tente novamente!"
+      );
+      window.location("/carrinho/");
+    }
+  };
 
   const convertReal = (number) => {
     const options = {
       style: "currency",
       currency: "BRL",
       minimumFractionDigits: 2,
-      maximumFractionDigits: 3,
+      maximumFractionDigits: 2,
     };
     const formatNumber = new Intl.NumberFormat("pt-BR", options);
     return formatNumber.format(number);
@@ -202,9 +247,7 @@ export const Carrinho = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          new_estoque,
-        }),
+        body: JSON.stringify({ estoque: new_estoque }),
       })
         .then((response) => response.json())
         .then((responseJson) => {
@@ -233,11 +276,33 @@ export const Carrinho = () => {
     },
     [itensCart, date]
   );
+  const getClientes = async () => {
+    fetch("http://localhost:8181/clientes")
+      .then((response) => response.json())
+      .then((responseJson) => {
+        if (responseJson.erro) {
+          setStatus({
+            type: "erro",
+            mensagem: responseJson.mensagem,
+          });
+        } else {
+          setClientes(responseJson.records);
+        }
+      })
+      .catch(() => {
+        setStatus({
+          type: "erro",
+          mensagem: "Erro: Lista de clientes não encontrada",
+        });
+      });
+  };
+
   useEffect(() => {
     getEstoquesFromProdutos();
+    getClientes();
   }, []);
   return (
-    <Body>
+    <>
       {status.type === "erro" ? (
         <AlertDanger>{status.mensagem}</AlertDanger>
       ) : (
@@ -248,162 +313,189 @@ export const Carrinho = () => {
       ) : (
         ""
       )}
-      <Container>
-        <Table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nome do Produto</th>
-              <th>Tipo de Produto</th>
-              <th>Preço</th>
-              <th>Valor do Imposto</th>
-              <th>Quantidade Disponível em Estoque</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {!isLoading &&
-              Object.values(produtos).map((produto) => (
-                <tr key={produto.id}>
-                  <td>{produto.id}</td>
-                  <td>{produto.nome}</td>
-                  <td>{produto.tipo}</td>
-                  <td>{convertReal(produto.preco)}</td>
-                  <td>
-                    {convertReal(
-                      calcImpostoPorProd(
-                        produto.preco,
-                        produto.percentual_imposto_tipo
-                      )
-                    )}
-                  </td>
-                  <td>{produto.estoque_qtde}</td>
+      <Body>
+        <Container>
+          <Table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome do Produto</th>
+                <th>Tipo de Produto</th>
+                <th>Preço</th>
+                <th>Valor do Imposto</th>
+                <th>Quantidade Disponível em Estoque</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {!isLoading &&
+                Object.values(produtos).map((produto) => (
+                  <tr key={produto.id}>
+                    <td>{produto.id}</td>
+                    <td>{produto.nome}</td>
+                    <td>{produto.tipo}</td>
+                    <td>{convertReal(produto.preco)}</td>
+                    <td>
+                      {convertReal(
+                        calcImpostoPorProd(
+                          produto.preco,
+                          produto.percentual_imposto_tipo
+                        )
+                      )}
+                    </td>
+                    <td>{produto.estoque_qtde}</td>
 
-                  <td>
-                    <CartRowCellPic>
-                      <ButtonFinal
-                        onClick={addProducToCart(id)}
-                        className="add"
-                      >
-                        +
-                      </ButtonFinal>
-                    </CartRowCellPic>
-                    <CartRowCellPic>
-                      onClick=
-                      {removeProductToCart(id)}
-                      <ButtonFinal className="remove" type="submit">
-                        -
-                      </ButtonFinal>
-                    </CartRowCellPic>
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </Table>
-      </Container>
-      <Container>
-        <CartContainer>
-          <Header>
-            <Titulo>Carrinho de Compras</Titulo>
-          </Header>
+                    <td>
+                      <CartRowCellPic>
+                        <ButtonFinal
+                          onClick={() => addProducToCart(produto.id)}
+                          className="add"
+                        >
+                          +
+                        </ButtonFinal>
+                      </CartRowCellPic>
+                      <CartRowCellPic>
+                        <ButtonFinal
+                          onClick={() => removeProductToCart(produto.id)}
+                          className="remove"
+                        >
+                          -
+                        </ButtonFinal>
+                      </CartRowCellPic>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </Table>
+        </Container>
+        <Container>
+          <Container>
+            <CartContainer>
+              <Header>
+                <Titulo>Carrinho de Compras</Titulo>
+              </Header>
 
-          <CartBody>
-            <CartItem>
-              {itensCart && !isEmpty(itensCart) ? (
-                itensCart.map((item) => (
-                  <CartRow key={item.id}>
-                    <CartRowCellPic>
-                      <PicLink onClick={removeItem(null)}>-</PicLink>
-
-                      <Badge></Badge>
-                    </CartRowCellPic>
-
-                    <CartRowDesc>
-                      <ProdutoTitulo>Gabinete Gamer</ProdutoTitulo>
-
-                      <ProdutoImp>Imposto por Item</ProdutoImp>
-                      <ProdutoImp>{item.imposto}</ProdutoImp>
-                    </CartRowDesc>
-
-                    <CartRowQuant>
-                      <NoneList>
-                        <ElemList>
-                          <ListLink onClick={addProducToCart(item.id)}>
+              <CartBody>
+                <CartItem>
+                  {itensCart && !isEmpty(itensCart) ? (
+                    itensCart.map((item) => (
+                      <CartRow key={item.id}>
+                        <CartRowCellPic>
+                          <PicLink onClick={() => clearItem(item.id)}>
                             -
-                          </ListLink>
-                        </ElemList>
+                          </PicLink>
 
-                        <ElemList>
-                          {itensCart.find((x) => x.id === item.id)?.qtd
-                            ? itensCart.find((x) => x.id === item.id)?.qtd
-                            : 0}
-                        </ElemList>
+                          <Badge></Badge>
+                        </CartRowCellPic>
 
-                        <ElemList>
-                          <ListLink onClick={removeProductToCart(item.id)}>
-                            +
-                          </ListLink>
-                        </ElemList>
-                      </NoneList>
-                    </CartRowQuant>
+                        <CartRowDesc>
+                          <ProdutoTitulo>{item.nome}</ProdutoTitulo>
 
-                    <CartRowAmount>
-                      <Valores>{item.total}</Valores>
-                    </CartRowAmount>
-                  </CartRow>
-                ))
-              ) : (
-                <AlertDanger>
-                  Não existem itens adicionados ao carrinho.
-                </AlertDanger>
-              )}
-            </CartItem>
-          </CartBody>
-          <Footer>
-            <Totals>
-              <TotalLabel>Subtotal</TotalLabel>
+                          <ProdutoImp>Imposto por Item</ProdutoImp>
+                          <ProdutoImp>{convertReal(item.imposto)}</ProdutoImp>
+                        </CartRowDesc>
 
-              <TotalAmount>
-                {() => {
-                  const total_subtotal_ped = 0;
-                  itensCart.forEach((item) => {
-                    return (total_subtotal_ped += item.total - item.imposto);
-                  });
-                }}
-              </TotalAmount>
-            </Totals>
+                        <CartRowQuant>
+                          <NoneList>
+                            <ElemList>
+                              <ListLink
+                                onClick={() => removeProductToCart(item.id)}
+                              >
+                                -
+                              </ListLink>
+                            </ElemList>
 
-            <Totals>
-              <TotalLabel>Total de Imposto do Pedido</TotalLabel>
+                            <ElemList>
+                              {itensCart.find((x) => x.id === item.id)?.qtd
+                                ? itensCart.find((x) => x.id === item.id)?.qtd
+                                : 0}
+                            </ElemList>
 
-              <TotalAmount>
-                {() => {
-                  const total_imposto_ped = 0;
-                  itensCart.forEach((item) => {
-                    return (total_imposto_ped += item.imposto);
-                  });
-                }}
-              </TotalAmount>
-            </Totals>
+                            <ElemList>
+                              <ListLink
+                                onClick={() => addProducToCart(item.id)}
+                              >
+                                +
+                              </ListLink>
+                            </ElemList>
+                          </NoneList>
+                        </CartRowQuant>
 
-            <Totals>
-              <TotalLabel>Total da Compra</TotalLabel>
+                        <CartRowAmount>
+                          <Valores>{convertReal(item.total)}</Valores>
+                        </CartRowAmount>
+                      </CartRow>
+                    ))
+                  ) : (
+                    <AlertDanger>
+                      Não existem itens adicionados ao carrinho.
+                    </AlertDanger>
+                  )}
+                </CartItem>
+              </CartBody>
+              <Footer>
+                <Totals>
+                  <TotalLabel>Subtotal</TotalLabel>
 
-              <TotalAmount>
-                {() => {
-                  const total_ped = 0;
-                  itensCart.forEach((item) => {
-                    return (total_ped += item.total);
-                  });
-                }}
-              </TotalAmount>
-            </Totals>
+                  <TotalAmount>
+                    {() => {
+                      const total_subtotal_ped = 0;
+                      itensCart.map((item) => {
+                        total_subtotal_ped += item.total - item.imposto;
+                        console.log(item);
+                      });
+                    }}
+                  </TotalAmount>
+                </Totals>
 
-            <ButtonFinal>Finalizar Compra</ButtonFinal>
-          </Footer>
-        </CartContainer>
-      </Container>
-    </Body>
+                <Totals>
+                  <TotalLabel>Total de Imposto do Pedido</TotalLabel>
+
+                  <TotalAmount>
+                    {() => {
+                      const total_imposto_ped = 0;
+                      itensCart.forEach((item) => {
+                        return (total_imposto_ped += item.imposto);
+                      });
+                    }}
+                  </TotalAmount>
+                </Totals>
+
+                <Totals>
+                  <TotalLabel>Total da Compra</TotalLabel>
+                  <TotalAmount>
+                    {() => {
+                      const total_ped = 0;
+                      itensCart.forEach((item) => {
+                        return (total_ped += item.total);
+                      });
+                    }}
+                  </TotalAmount>
+                </Totals>
+              </Footer>
+            </CartContainer>
+          </Container>
+          <Box>
+            <Titulo>Selecione o seu nome abaixo:</Titulo>
+            <Label>Nome do cadastro do cliente: </Label>
+            <Select
+              name="cli_id"
+              onChange={valorSelect}
+              value={clientes.cli_id}
+            >
+              {Object.values(clientes).map((cliente) => (
+                <option key={cliente.id} value={cliente.id}>
+                  {cliente.cli_nome}
+                </option>
+              ))}
+            </Select>
+            <ButtonFinal onClick={() => preparaPedido(itensCart)}>
+              Finalizar Compra
+            </ButtonFinal>
+          </Box>
+        </Container>
+      </Body>
+    </>
   );
 };
 export default Carrinho;
