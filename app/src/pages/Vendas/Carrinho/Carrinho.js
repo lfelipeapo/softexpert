@@ -95,9 +95,7 @@ export const Carrinho = () => {
   }, 0);
 
   let obterPedImposto = itensCart.reduce((prev, el) => {
-    return (
-      prev + el.item_val_imposto
-    );
+    return prev + el.item_val_imposto;
   }, 0);
 
   let obterQtdeItensPed = itensCart.reduce((prev, el) => {
@@ -222,7 +220,7 @@ export const Carrinho = () => {
         data_at: date,
       };
       const novos_estoques = [...novoEstoque, novo_estoque];
-      setNovoEstoque(novos_estoques);
+            setNovoEstoque(novos_estoques);
     }
   };
 
@@ -254,10 +252,12 @@ export const Carrinho = () => {
           data_at: date,
         };
         const novos_estoques = [...novoEstoque, novo_estoque];
-        setNovoEstoque(novos_estoques);
+          setNovoEstoque(novos_estoques);
       }
     }
   };
+
+  console.log(novoEstoque);
 
   const getEstoquesFromProdutos = async () => {
     setIsLoading(true);
@@ -397,8 +397,8 @@ export const Carrinho = () => {
             setPedido(ped);
             if (cadPedido()) {
               let novos_estoques = novoEstoque;
-              // atualizaTodoEstoque(novos_estoques);
-              // getEstoquesFromProdutos();
+              atualizaTodoEstoque(novos_estoques);
+              getEstoquesFromProdutos();
               // window.location.reload(true);
             }
           } else {
