@@ -1,6 +1,6 @@
-import { isEmpty, isNil, isNumber } from "lodash";
+import { concat, isEmpty, isNil, isNumber, sum, toNumber } from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
-import { ConteudoForm, Form, Label, Select } from "../../Estoque/Editar/styles";
+import { Label, Select } from "../../Estoque/Editar/styles";
 import { Table } from "../../Produtos/Home/styles";
 import {
   Badge,
@@ -59,6 +59,39 @@ export const Carrinho = () => {
     data_pg: "",
   });
 
+  const convertReal = (number) => {
+    const options = {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    };
+    const formatNumber = new Intl.NumberFormat("pt-BR", options);
+    return formatNumber.format(number);
+  };
+
+  const calcImpostoPorProd = (valor, imposto_percentual) => {
+    if (!isNil(valor) && !isNil(imposto_percentual))
+      return (
+        toNumber(parseFloat(valor).toFixed(2)) *
+        toNumber((toNumber(imposto_percentual) / 100).toFixed(2))
+      );
+  };
+
+  let obterPedSubTotal = itensCart.reduce((prev, el) => {
+    return prev + el.item_ped_qtde * el.item_ped_val_unit;
+  }, 0);
+
+  let obterPedImposto = itensCart.reduce((prev, el) => {
+    return prev + el.item_ped_qtde * toNumber(parseFloat(el.item_val_imposto).toFixed(2));
+  }, 0);
+
+  let obterTotaldoPed = obterPedSubTotal + obterPedImposto;
+
+  const formatData = (dataSql) => {
+    if (!isNil(dataSql)) return dataSql.split("-").reverse().join("/");
+  };
+
   const valorSelect = (e) =>
     setClientes({ ...clientes, [e.target.name]: e.target.value });
 
@@ -66,33 +99,37 @@ export const Carrinho = () => {
     let produtos_estoque = [...produtos];
     const copyItensCart = [...itensCart];
     let estoque = produtos_estoque?.find((x) => x?.id === id);
-    const item = copyItensCart?.find((x) => x?.id === id);
+    const item = copyItensCart?.find((x) => x?.prod_id === id);
     let imposto_produto = calcImpostoPorProd(
       estoque.preco,
       estoque.percentual_imposto_tipo
     );
+    imposto_produto = toNumber(parseFloat(imposto_produto).toFixed(2));
+    console.log(imposto_produto);
+
     if (id && estoque && estoque.estoque_qtde !== 0) {
       if (isEmpty(itensCart) || !item) {
         copyItensCart.push({
           estoque_id: estoque.estoque_id,
-          id: id,
-          qtd: 1,
+          prod_id: id,
+          item_ped_val_unit: estoque.preco,
+          item_ped_qtde: 1,
           nome: estoque.nome,
-          preco: parseFloat(estoque.preco),
-          imposto: imposto_produto,
-          total: estoque.preco * 1 + imposto_produto,
+          item_val_imposto: imposto_produto,
+          item_ped_valor_total: estoque.preco * 1 + imposto_produto,
         });
         estoque.estoque_qtde--;
       } else {
-        item.qtd = item.qtd + 1;
-        item.imposto = imposto_produto * item.qtd;
-        item.total = item.imposto + item.preco * item.qtd;
+        item.item_ped_qtde = item.item_ped_qtde + 1;
+        item.item_val_imposto = imposto_produto * item.item_ped_qtde;
+        item.item_ped_valor_total =
+          item.item_val_imposto + item.item_ped_val_unit * item.item_ped_qtde;
         estoque.estoque_qtde--;
       }
     }
     // const novo_estoque = {
     //   id: estoque?.estoque_id ? estoque?.estoque_id : item?.estoque_id,
-    //   prod_id: estoque?.id ? estoque?.id : item?.id,
+    //   prod_id: estoque?.id ? estoque?.id : item?.prod_id,
     //   estoque_qtde: estoque?.estoque_qtde,
     //   data_cad: null,
     //   data_at: date,
@@ -105,37 +142,33 @@ export const Carrinho = () => {
     if (id && itensCart && produtos) {
       const produtos_estoque = [...produtos];
       const copyItensCart = [...itensCart];
-      const item = copyItensCart.find((produto) => produto.id === id);
+      const item = copyItensCart.find((produto) => produto.prod_id === id);
       let estoque = produtos_estoque.find((produto) => produto.id === id);
       let imposto_produto = calcImpostoPorProd(
         estoque.preco,
         estoque.percentual_imposto_tipo
       );
       if (item) {
-        console.log("entrou");
         if (
           !isNil(estoque.estoque_qtde) &&
-          !isNil(item.qtd) &&
-          item.qtd !== 0
+          !isNil(item.item_ped_qtde) &&
+          item.item_ped_qtde !== 0
         ) {
-          console.log("aqui");
-          console.log(item.qtd);
           if (
-            item.qtd > 1 &&
+            item.item_ped_qtde > 1 &&
             !isNil(imposto_produto) &&
             isNumber(imposto_produto)
           ) {
-            console.log("quantidade maior que 1");
-            console.table(item);
             estoque.estoque_qtde++;
-            item.qtd--;
-            item.imposto = imposto_produto * item.qtd;
-            item.total -= item.imposto + item.preco;
+            item.item_ped_qtde--;
+            item.item_val_imposto = imposto_produto * item.item_ped_qtde;
+            item.item_ped_valor_total -=
+              item.item_val_imposto + item.item_ped_val_unit;
             setItensCart(copyItensCart);
-          } else if (item.qtd == 1) {
+          } else if (item.item_ped_qtde == 1) {
             estoque.estoque_qtde++;
             const arrayFiltered = copyItensCart.filter(
-              (produto) => produto.id !== id
+              (produto) => produto.prod_id !== id
             );
             setItensCart(arrayFiltered);
           }
@@ -158,20 +191,21 @@ export const Carrinho = () => {
 
     if (itensCart) {
       const copyItensCart = [...itensCart];
-      const item = copyItensCart.find((item) => item.id === id);
+      const item = copyItensCart.find((item) => item.prod_id === id);
       if (
         itensCart &&
         item &&
         !isEmpty(itensCart) &&
         !isEmpty(item) &&
-        item.qtd !== 0 &&
-        !isNil(item.qtd) &&
+        item.item_ped_qtde !== 0 &&
+        !isNil(item.item_ped_qtde) &&
         !isNil(produto.estoque_qtde)
       ) {
-        const arrayFiltered = copyItensCart.filter((item) => item.id !== id);
+        const arrayFiltered = copyItensCart.filter(
+          (item) => item.prod_id !== id
+        );
         setItensCart(arrayFiltered);
-        console.log(produto.estoque_qtde);
-        produto.estoque_qtde += item.qtd;
+        produto.estoque_qtde += item.item_ped_qtde;
         const novo_estoque = {
           id: produto.estoque_id,
           prod_id: produto.id,
@@ -184,7 +218,7 @@ export const Carrinho = () => {
 
   const preparaPedido = (itens) => {
     if (itens && !isEmpty(itens)) {
-      if (clientes && !isEmpty(clientes)) {
+      if (clientes && !isEmpty(clientes) && hasClientes) {
       } else {
         return alert("Por favor faça um cadastro e tente novamente!");
         window.location("/clientes/cadastrar");
@@ -197,25 +231,6 @@ export const Carrinho = () => {
     }
   };
 
-  const convertReal = (number) => {
-    const options = {
-      style: "currency",
-      currency: "BRL",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    };
-    const formatNumber = new Intl.NumberFormat("pt-BR", options);
-    return formatNumber.format(number);
-  };
-
-  const calcImpostoPorProd = (valor, imposto_percentual) => {
-    if (!isNil(valor) && !isNil(imposto_percentual)) {
-      return parseFloat(valor) * (parseFloat(imposto_percentual) / 100);
-    }
-  };
-  const formatData = (dataSql) => {
-    if (!isNil(dataSql)) return dataSql.split("-").reverse().join("/");
-  };
   const getEstoquesFromProdutos = async () => {
     setIsLoading(true);
     await fetch("http://localhost:8181/estoque/produtos")
@@ -277,6 +292,7 @@ export const Carrinho = () => {
     },
     [itensCart, date]
   );
+
   const getClientes = async () => {
     fetch("http://localhost:8181/clientes")
       .then((response) => response.json())
@@ -290,7 +306,9 @@ export const Carrinho = () => {
           setClientes(responseJson.records);
         }
       })
-      .finally(() => { setHasClientes(true); })
+      .finally(() => {
+        setHasClientes(true);
+      })
       .catch(() => {
         setStatus({
           type: "erro",
@@ -302,6 +320,7 @@ export const Carrinho = () => {
   useEffect(() => {
     getEstoquesFromProdutos();
     getClientes();
+    console.log(itensCart);
   }, []);
   return (
     <>
@@ -381,9 +400,9 @@ export const Carrinho = () => {
                 <CartItem>
                   {itensCart && !isEmpty(itensCart) ? (
                     itensCart.map((item) => (
-                      <CartRow key={item.id}>
+                      <CartRow key={item.prod_id}>
                         <CartRowCellPic>
-                          <PicLink onClick={() => clearItem(item.id)}>
+                          <PicLink onClick={() => clearItem(item.prod_id)}>
                             -
                           </PicLink>
 
@@ -394,28 +413,35 @@ export const Carrinho = () => {
                           <ProdutoTitulo>{item.nome}</ProdutoTitulo>
 
                           <ProdutoImp>Imposto por Item</ProdutoImp>
-                          <ProdutoImp>{convertReal(item.imposto)}</ProdutoImp>
+                          <ProdutoImp>
+                            {convertReal(item.item_val_imposto)}
+                          </ProdutoImp>
                         </CartRowDesc>
 
                         <CartRowQuant>
                           <NoneList>
                             <ElemList>
                               <ListLink
-                                onClick={() => removeProductToCart(item.id)}
+                                onClick={() =>
+                                  removeProductToCart(item.prod_id)
+                                }
                               >
                                 -
                               </ListLink>
                             </ElemList>
 
                             <ElemList>
-                              {itensCart.find((x) => x.id === item.id)?.qtd
-                                ? itensCart.find((x) => x.id === item.id)?.qtd
+                              {itensCart.find((x) => x.prod_id === item.prod_id)
+                                ?.item_ped_qtde
+                                ? itensCart.find(
+                                    (x) => x.prod_id === item.prod_id
+                                  )?.item_ped_qtde
                                 : 0}
                             </ElemList>
 
                             <ElemList>
                               <ListLink
-                                onClick={() => addProducToCart(item.id)}
+                                onClick={() => addProducToCart(item.prod_id)}
                               >
                                 +
                               </ListLink>
@@ -424,7 +450,9 @@ export const Carrinho = () => {
                         </CartRowQuant>
 
                         <CartRowAmount>
-                          <Valores>{convertReal(item.total)}</Valores>
+                          <Valores>
+                            {convertReal(item.item_ped_valor_total)}
+                          </Valores>
                         </CartRowAmount>
                       </CartRow>
                     ))
@@ -439,40 +467,18 @@ export const Carrinho = () => {
                 <Totals>
                   <TotalLabel>Subtotal</TotalLabel>
 
-                  <TotalAmount>
-                    {() => {
-                      const total_subtotal_ped = 0;
-                      itensCart.map((item) => {
-                        total_subtotal_ped += item.total - item.imposto;
-                        console.log(item);
-                      });
-                    }}
-                  </TotalAmount>
+                  <TotalAmount>{itensCart && convertReal(obterPedSubTotal)}</TotalAmount>
                 </Totals>
 
                 <Totals>
                   <TotalLabel>Total de Imposto do Pedido</TotalLabel>
 
-                  <TotalAmount>
-                    {() => {
-                      const total_imposto_ped = 0;
-                      itensCart.forEach((item) => {
-                        return (total_imposto_ped += item.imposto);
-                      });
-                    }}
-                  </TotalAmount>
+                  <TotalAmount>{convertReal(obterPedImposto)}</TotalAmount>
                 </Totals>
 
                 <Totals>
                   <TotalLabel>Total da Compra</TotalLabel>
-                  <TotalAmount>
-                    {() => {
-                      const total_ped = 0;
-                      itensCart.forEach((item) => {
-                        return (total_ped += item.total);
-                      });
-                    }}
-                  </TotalAmount>
+                  <TotalAmount>{convertReal(obterTotaldoPed)}</TotalAmount>
                 </Totals>
               </Footer>
             </CartContainer>
@@ -499,7 +505,8 @@ export const Carrinho = () => {
             </Box>
           ) : (
             <AlertDanger>
-              Sem cadastro de clientes encontrado, por favor adicione um para finalizar a compra.
+              Sem cadastro de clientes encontrado, por favor adicione um para
+              finalizar a compra.
             </AlertDanger>
           )}
         </Container>

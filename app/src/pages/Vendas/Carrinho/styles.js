@@ -234,7 +234,7 @@ export const Totals = styled.div`
 `;
 
 export const TotalLabel = styled.p`
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   flex: 1;
   text-align: left;
   border-bottom: #dadada 1px solid;
@@ -243,7 +243,7 @@ export const TotalLabel = styled.p`
 
 export const TotalAmount = styled.p`
   flex: 1;
-
+  font-size: 1.25rem;
   text-align: right;
 `;
 
