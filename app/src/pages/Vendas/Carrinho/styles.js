@@ -225,9 +225,8 @@ export const Valores = styled.p`
 
 export const Totals = styled.div`
   display: flex;
-
   flex-direction: row;
-
+  border-bottom: #dadada 1px solid;
   p {
     margin: 5px 0;
   }
@@ -237,13 +236,16 @@ export const TotalLabel = styled.p`
   font-size: 1.25rem;
   flex: 1;
   text-align: left;
-  border-bottom: #dadada 1px solid;
-  padding-bottom: 1rem;
+
 `;
 
 export const TotalAmount = styled.p`
+  display: flex;
+  align-self: center;
+  justify-content: right;
   flex: 1;
   font-size: 1.25rem;
+  font-weight: 600;
   text-align: right;
 `;
 

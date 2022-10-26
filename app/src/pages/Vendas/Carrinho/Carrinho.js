@@ -40,6 +40,7 @@ export const Carrinho = () => {
 
   const [produtos, setProdutos] = useState([]);
   const [itensCart, setItensCart] = useState([]);
+  const [novoEstoque, setNovoEstoque] = useState([]);
 
   const [status, setStatus] = useState({
     type: "",
@@ -47,10 +48,16 @@ export const Carrinho = () => {
   });
 
   const [clientes, setClientes] = useState([]);
+  const [cliente, setCliente] = useState({
+    cli_id: "",
+    cli_nome: "",
+    data_cad: date,
+    data_at: null,
+  });
 
   const [pedido, setPedido] = useState({
     itens: [],
-    clid_id: "",
+    cli_id: "",
     ped_subtotal: 0,
     ped_imposto: 0,
     ped_valor: 0,
@@ -83,17 +90,41 @@ export const Carrinho = () => {
   }, 0);
 
   let obterPedImposto = itensCart.reduce((prev, el) => {
-    return prev + el.item_ped_qtde * toNumber(parseFloat(el.item_val_imposto).toFixed(2));
+    return (
+      prev +
+      el.item_ped_qtde * toNumber(parseFloat(el.item_val_imposto).toFixed(2))
+    );
+  }, 0);
+
+  let obterQtdeIensPed = itensCart.reduce((prev, el) => {
+    return prev + el.item_ped_qtde;
   }, 0);
 
   let obterTotaldoPed = obterPedSubTotal + obterPedImposto;
+
+  const obterPedidoFinal = () => {
+    let ped = {
+      ...pedido,
+      itens: itensCart,
+      cli_id: cliente.cli_id,
+      ped_subtotal: obterPedSubTotal,
+      ped_imposto: obterPedImposto,
+      ped_valor: obterTotaldoPed,
+      ped_qtde: obterQtdeIensPed,
+      data_ped: date,
+      data_pg: "",
+    };
+    setPedido(ped);
+  };
 
   const formatData = (dataSql) => {
     if (!isNil(dataSql)) return dataSql.split("-").reverse().join("/");
   };
 
-  const valorSelect = (e) =>
-    setClientes({ ...clientes, [e.target.name]: e.target.value });
+  const valorSelect = (e) => {
+    setCliente(clientes.find((cliente) => cliente.cli_id === e.target.value));
+  };
+  console.log(cliente);
 
   const addProducToCart = (id) => {
     let produtos_estoque = [...produtos];
@@ -105,7 +136,6 @@ export const Carrinho = () => {
       estoque.percentual_imposto_tipo
     );
     imposto_produto = toNumber(parseFloat(imposto_produto).toFixed(2));
-    console.log(imposto_produto);
 
     if (id && estoque && estoque.estoque_qtde !== 0) {
       if (isEmpty(itensCart) || !item) {
@@ -127,13 +157,15 @@ export const Carrinho = () => {
         estoque.estoque_qtde--;
       }
     }
-    // const novo_estoque = {
-    //   id: estoque?.estoque_id ? estoque?.estoque_id : item?.estoque_id,
-    //   prod_id: estoque?.id ? estoque?.id : item?.prod_id,
-    //   estoque_qtde: estoque?.estoque_qtde,
-    //   data_cad: null,
-    //   data_at: date,
-    // };
+    const novo_estoque = {
+      id: estoque?.estoque_id ? estoque?.estoque_id : item?.estoque_id,
+      prod_id: estoque?.id ? estoque?.id : item?.prod_id,
+      estoque_qtde: estoque?.estoque_qtde,
+      data_cad: null,
+      data_at: date,
+    };
+    const novos_estoques = [...novoEstoque, novo_estoque];
+    setNovoEstoque(novos_estoques);
     setProdutos(produtos_estoque);
     setItensCart(copyItensCart);
   };
@@ -175,13 +207,15 @@ export const Carrinho = () => {
           setProdutos(produtos_estoque);
         }
       }
-      // const novo_estoque = {
-      //   id: estoque.estoque_id,
-      //   prod_id: estoque.id,
-      //   estoque_qtde: estoque.estoque_qtde,
-      //   data_cad: null,
-      //   data_at: date,
-      // };
+      const novo_estoque = {
+        id: estoque.estoque_id,
+        prod_id: estoque.id,
+        estoque_qtde: estoque.estoque_qtde,
+        data_cad: null,
+        data_at: date,
+      };
+      const novos_estoques = [...novoEstoque, novo_estoque];
+      setNovoEstoque(novos_estoques);
     }
   };
 
@@ -212,22 +246,34 @@ export const Carrinho = () => {
           estoque_qtde: produto.estoque_qtde,
           data_at: date,
         };
+        const novos_estoques = [...novoEstoque, novo_estoque];
+        setNovoEstoque(novos_estoques);
       }
     }
   };
 
-  const preparaPedido = (itens) => {
+  const finalizaPedido = (itens) => {
+    let ped = { ...pedido };
     if (itens && !isEmpty(itens)) {
-      if (clientes && !isEmpty(clientes) && hasClientes) {
+      if (hasClientes && Object.keys(cliente).length !== 0 && !isEmpty(ped.cli_id)) {
+        obterPedidoFinal();
+        const confPed = window.confirm(
+          "Gostaria de confirmar seu pedido de valor total de " +
+            convertReal(ped.ped_valor) +
+            "?"
+        );
+        if (confPed) {
+          console.log(ped);
+        } else alert("errou...");
       } else {
-        return alert("Por favor faça um cadastro e tente novamente!");
-        window.location("/clientes/cadastrar");
+        alert("Por favor faça um cadastro e tente novamente!");
+        window.location.replace("/clientes/cadastrar");
       }
     } else {
-      return alert(
+      alert(
         "Não é permitido finalizar um pedido sem itens, por favor, faça o pedido e tente novamente!"
       );
-      window.location("/carrinho/");
+      window.location.replace("/carrinho/");
     }
   };
 
@@ -320,8 +366,13 @@ export const Carrinho = () => {
   useEffect(() => {
     getEstoquesFromProdutos();
     getClientes();
-    console.log(itensCart);
+    console.log(pedido);
   }, []);
+
+  useEffect(() => {
+    obterPedidoFinal();
+  }, [itensCart, cliente, obterPedImposto, obterPedSubTotal, obterQtdeIensPed, obterTotaldoPed, date]);
+
   return (
     <>
       {status.type === "erro" ? (
@@ -467,7 +518,9 @@ export const Carrinho = () => {
                 <Totals>
                   <TotalLabel>Subtotal</TotalLabel>
 
-                  <TotalAmount>{itensCart && convertReal(obterPedSubTotal)}</TotalAmount>
+                  <TotalAmount>
+                    {itensCart && convertReal(obterPedSubTotal)}
+                  </TotalAmount>
                 </Totals>
 
                 <Totals>
@@ -488,18 +541,18 @@ export const Carrinho = () => {
             <Box>
               <Titulo>Selecione o seu nome abaixo:</Titulo>
               <Label>Nome do cadastro do cliente: </Label>
-              <Select
-                name="cli_id"
-                onChange={valorSelect}
-                value={clientes.cli_id}
-              >
+              <Select name="cli_id" onChange={valorSelect} value={cliente.cli}>
                 {Object.values(clientes).map((cliente) => (
-                  <option key={cliente.id} value={cliente.id}>
+                  <option
+                    key={cliente.cli_id}
+                    selected={cliente?.cli_id[0]}
+                    value={cliente.cli_id}
+                  >
                     {cliente.cli_nome}
                   </option>
                 ))}
               </Select>
-              <ButtonFinal onClick={() => preparaPedido(itensCart)}>
+              <ButtonFinal onClick={() => finalizaPedido(itensCart)}>
                 Finalizar Compra
               </ButtonFinal>
             </Box>
