@@ -56,6 +56,36 @@ class EstoqueDAO extends DAO
         return $model->rows;
     }
 
+    public function updateAllFromSet($responseJson)
+    {
+        $model = new EstoqueModel;
+        $utils = new RequestUtils;
+        foreach ($responseJson['novos_estoques'] as $novo_estoque) {
+            $model->id = $novo_estoque['id'];
+            $model->prod_id = $novo_estoque['prod_id'];
+            $model->estoque_qtde = $novo_estoque['estoque_qtde'];
+
+            if (!$utils->isNil($novo_estoque['data_cad'])) $model->data_cad = $novo_estoque['data_cad'];
+            elseif (!array_key_exists('data_cad', $responseJson)) $model->data_cad = NULL;
+
+            $model->data_at = date("Y-m-d");
+
+            $sql = "UPDATE estoque SET prod_id=?, estoque_qtde=?, data_cad=?, data_at=? WHERE id=?";
+
+            $stmt = $this->conexao->prepare($sql);
+
+            $stmt->bindValue(1, $model->prod_id);
+            $stmt->bindValue(2, $model->estoque_qtde);
+            $stmt->bindValue(3, $model->data_cad);
+            $stmt->bindValue(4, $model->data_at);
+            $stmt->bindValue(5, $model->id);
+
+            $stmt->execute();
+
+            return $this->rows;
+        }
+    }
+
     public function selectAll()
     {
         $sql = "SELECT * FROM estoque ";

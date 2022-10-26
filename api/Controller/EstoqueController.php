@@ -55,6 +55,23 @@ class EstoqueController extends Controller
         parent::render('Estoque/ListarEstoques');
     }
 
+    public static function updateAllFromSet()
+    {
+        $utils = new RequestUtils;
+        $responseJson = $utils->decodeResponseIfPost();
+        if ($responseJson and !$utils->isNil($responseJson['novos_estoques']) and is_array($responseJson['novos_estoques']) and sizeof($responseJson['novos_estoques']) !== 0) {
+            $model = new EstoqueModel();
+            $model->updateAll($responseJson);
+        } else {
+            $response = [
+                "erro" => true,
+                "mensagem" => "Procedimento não realizado com sucesso!"
+            ];
+            $utils->encodeResponse($response);
+        }
+        parent::render('Estoque/ListarEstoquePorId');
+    }
+
     public static function update()
     {
         $utils = new RequestUtils;
@@ -64,7 +81,10 @@ class EstoqueController extends Controller
             $model->id = $responseJson['estoque']['id'];
             $model->prod_id = $responseJson['estoque']['prod_id'];
             $model->estoque_qtde = $responseJson['estoque']['estoque_qtde'];
-            $model->data_cad = $responseJson['estoque']['data_cad'];
+            if (!$utils->isNil($responseJson['estoque']['data_cad'])) $model->data_cad = $responseJson['estoque']['data_cad'];
+            elseif (
+                !array_key_exists('data_cad', $responseJson)
+            ) $model->data_cad = NULL;
             $model->data_at = date("Y-m-d");
             $model->update();
         } else {

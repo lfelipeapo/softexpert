@@ -123,6 +123,10 @@ switch (URL) {
         EstoqueController::update();
         break;
 
+    case PATH[1] === 'estoque' and PATH[2] === 'update-all':
+        EstoqueController::updateAllFromSet();
+        break;
+
     case PATH[1] === 'estoque' and PATH[2] === 'delete' and is_numeric(PATH[3]):
         $id = PATH[3];
         EstoqueController::delete($id);

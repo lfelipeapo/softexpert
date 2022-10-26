@@ -27,21 +27,33 @@ class PedidosDAO extends DAO
         $stmt->bindValue(4, $model->data_ped);
         $stmt->bindValue(5, $model->data_pg);
 
-        $stmt->execute();
-
-        if ($stmt->rowCount()) {
+        if ($stmt->execute()) {
             $ped_id = $this->conexao->lastInsertId();
             if ($ped_id and !$utils->isNil($ped_id) and $model->itens and is_array($model->itens)) {
                 foreach ($model->itens as $itens) {
-                    $sql_itens = "INSERT INTO itens_pedido (ped_id, prod_id, item_ped_val_unit, item_ped_qtde, item_val_imposto, item_ped_valor_total) VALUES (?, ?, ?, ?, ?, ?) ";
+
+                    $model->prod_id = $itens["prod_id"];
+                    $model->val_unit = $itens["val_unit"];
+                    $model->item_ped_qtde = $itens["item_ped_qtde"];
+                    $model->item_val_imposto = $itens["item_val_imposto"];
+                    $model->valor_total = $itens["valor_total"];
+
+                    $sql_itens = "INSERT INTO itens_pedido (ped_id, prod_id, val_unit, item_ped_qtde, item_val_imposto, valor_total) VALUES (:ped_id, :prod_id, :val_unit, :item_ped_qtde, :item_val_imposto, :valor_total)";
+
                     $insert = $this->conexao->prepare($sql_itens);
-                    $stmt->bindValue(1, $ped_id);
-                    $stmt->bindValue(2, $model->prod_id);
-                    $stmt->bindValue(3, $model->item_ped_val_unit);
-                    $stmt->bindValue(4, $model->item_ped_qtde);
-                    $stmt->bindValue(5, $model->item_val_imposto);
-                    $stmt->bindValue(6, $model->item_ped_valor_total);
+
+                    $insert->bindParam(':ped_id', $ped_id);
+                    $insert->bindParam(':prod_id', $model->prod_id);
+                    $insert->bindParam(':val_unit', $model->val_unit);
+                    $insert->bindParam(':item_ped_qtde', $model->item_ped_qtde);
+                    $insert->bindParam(':item_val_imposto', $model->item_val_imposto);
+                    $insert->bindParam(':valor_total', $model->valor_total);
+
+                    $insert = $this->conexao->prepare($sql_itens);
+
+                    $insert->execute();
                 }
+
                 $model->rows = $stmt->rowCount();
 
                 return $model->rows;

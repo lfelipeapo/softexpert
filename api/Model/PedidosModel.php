@@ -8,7 +8,7 @@ use Utils\RequestUtils;
 class PedidosModel extends Model
 {
 
-    public $rows, $id, $cli_id, $ped_valor, $ped_qtde, $data_ped, $data_pg, $itens, $prod_id, $item_ped_val_unit, $item_ped_qtde, $item_val_imposto, $item_ped_valor_total;
+    public $rows, $id, $cli_id, $ped_valor, $ped_qtde, $data_ped, $data_pg, $itens, $prod_id, $valor_total, $item_ped_qtde, $item_val_imposto, $valor_total;
 
     public function save()
     {

@@ -52,12 +52,12 @@ class PedidosController extends Controller
     {
         $utils = new RequestUtils;
         $responseJson = $utils->decodeResponseIfPost();
-        if ($responseJson and is_array($responseJson['pedidos']['itens']) and !$utils->isNil($responseJson['pedidos']['ped_valor']) and !$utils->isNil($responseJson['pedidos']['ped_qtde']) and $utils->isNil($responseJson['produtos']['id'])) {
+        if ($responseJson and is_array($responseJson['pedido']['itens']) and !$utils->isNil($responseJson['pedido']['ped_valor']) and !$utils->isNil($responseJson['pedido']['ped_qtde']) and $utils->isNil($responseJson['pedido']['id'])) {
             $model = new PedidosModel();
-            $model->itens = $responseJson['pedidos']['itens'];
-            $model->cli_id = $responseJson['pedidos']['cli_id'];
-            $model->ped_valor = $responseJson['pedidos']['ped_valor'];
-            $model->ped_qtde = $responseJson['pedidos']['ped_qtde'];
+            $model->itens = $responseJson['pedido']['itens'];
+            $model->cli_id = $responseJson['pedido']['cli_id'];
+            $model->ped_valor = $responseJson['pedido']['ped_valor'];
+            $model->ped_qtde = $responseJson['pedido']['ped_qtde'];
             $model->data_ped = date("Y-m-d");
             $model->data_pg =  date("Y-m-d");
             $model->save();
