@@ -565,7 +565,7 @@ export const Carrinho = () => {
 
                         <CartRowAmount>
                           <Valores>
-                            {convertReal(toNumber(item.item_ped_valor_total))}
+                            {convertReal(item.item_ped_valor_total)}
                           </Valores>
                         </CartRowAmount>
                       </CartRow>
