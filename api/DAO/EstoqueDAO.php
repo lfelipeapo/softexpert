@@ -82,7 +82,19 @@ class EstoqueDAO extends DAO
 
             $stmt->execute();
 
-            return $this->rows;
+                    if ($this->rows != 0) {
+            $response = [
+                "erro" => false,
+                "mensagem" => "Estoque atualizado com sucesso!"
+            ];
+        } else {
+            $response = [
+                "erro" => true,
+                "mensagem" => "Não ocorreu nenhuma alteração no registro!"
+            ];
+        }
+        $utils->encodeResponse($response);
+        die;
         }
     }
 

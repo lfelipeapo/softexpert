@@ -55,21 +55,7 @@ class EstoqueModel extends Model
     public function updateAll($responseJson)
     {
         $dao = new EstoqueDAO();
-        $utils = new RequestUtils;
         $dao->updateAllFromSet($responseJson);
-        if ($this->rows != 0) {
-            $response = [
-                "erro" => false,
-                "mensagem" => "Estoque atualizado com sucesso!"
-            ];
-        } else {
-            $response = [
-                "erro" => true,
-                "mensagem" => "Não ocorreu nenhuma alteração no registro!"
-            ];
-        }
-        $utils->encodeResponse($response);
-        die;
     }
 
 
