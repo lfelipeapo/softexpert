@@ -91,7 +91,7 @@ export const Carrinho = () => {
   };
 
   let obterPedSubTotal = itensCart.reduce((prev, el) => {
-    return prev + el.item_ped_qtde * el.item_ped_val_unit;
+    return prev + el.item_ped_qtde * el.val_unit;
   }, 0);
 
   let obterPedImposto = itensCart.reduce((prev, el) => {
@@ -144,18 +144,18 @@ export const Carrinho = () => {
         copyItensCart.push({
           estoque_id: estoque.estoque_id,
           prod_id: id,
-          item_ped_val_unit: toNumber(estoque.preco),
+          val_unit: toNumber(estoque.preco),
           item_ped_qtde: 1,
           nome: estoque.nome,
           item_val_imposto: imposto_produto,
-          item_ped_valor_total: estoque.preco * 1 + imposto_produto,
+          valor_total: estoque.preco * 1 + imposto_produto,
         });
         estoque.estoque_qtde--;
       } else {
         item.item_ped_qtde = item.item_ped_qtde + 1;
         item.item_val_imposto = imposto_produto * item.item_ped_qtde;
-        item.item_ped_valor_total =
-          item.item_val_imposto + item.item_ped_val_unit * item.item_ped_qtde;
+        item.valor_total =
+          item.item_val_imposto + item.val_unit * item.item_ped_qtde;
         estoque.estoque_qtde--;
       }
     }
@@ -198,9 +198,9 @@ export const Carrinho = () => {
             item.item_ped_qtde--;
             item.item_val_imposto = imposto_produto * item.item_ped_qtde;
             toNumber(parseFloat(item.item_val_imposto).toFixed(2));
-            item.item_ped_valor_total -=
-              item.item_val_imposto + item.item_ped_val_unit;
-            toNumber(parseFloat(item.item_ped_valor_total).toFixed(2));
+            item.valor_total -=
+              item.item_val_imposto + item.val_unit;
+            toNumber(parseFloat(item.valor_total).toFixed(2));
             setItensCart(copyItensCart);
           } else if (item.item_ped_qtde == 1) {
             estoque.estoque_qtde++;
@@ -245,12 +245,14 @@ export const Carrinho = () => {
         );
         setItensCart(arrayFiltered);
         produto.estoque_qtde += item.item_ped_qtde;
+
         const novo_estoque = {
           id: produto.estoque_id,
           prod_id: produto.id,
           estoque_qtde: produto.estoque_qtde,
           data_at: date,
         };
+        
         const novos_estoques = [...novoEstoque, novo_estoque];
           setNovoEstoque(novos_estoques);
       }
@@ -565,7 +567,7 @@ export const Carrinho = () => {
 
                         <CartRowAmount>
                           <Valores>
-                            {convertReal(item.item_ped_valor_total)}
+                            {convertReal(item.valor_total)}
                           </Valores>
                         </CartRowAmount>
                       </CartRow>

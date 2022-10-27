@@ -38,20 +38,17 @@ class PedidosDAO extends DAO
                     $model->item_val_imposto = $itens["item_val_imposto"];
                     $model->valor_total = $itens["valor_total"];
 
-                    $sql_itens = "INSERT INTO itens_pedido (ped_id, prod_id, val_unit, item_ped_qtde, item_val_imposto, valor_total) VALUES (:ped_id, :prod_id, :val_unit, :item_ped_qtde, :item_val_imposto, :valor_total)";
+                    $query_parcelas = "INSERT INTO itens_pedido (ped_id, prod_id, val_unit, item_ped_qtde, item_val_imposto, valor_total) VALUES ( ?, ?, ?, ?, ?, ?)";
+                    $pedido = $this->conexao->prepare($query_parcelas);
 
-                    $insert = $this->conexao->prepare($sql_itens);
+                    $pedido->bindValue(1, $ped_id);
+                    $pedido->bindValue(2, $model->prod_id);
+                    $pedido->bindValue(3, $model->val_unit);
+                    $pedido->bindValue(4, $model->item_ped_qtde);
+                    $pedido->bindValue(5, $model->item_val_imposto);
+                    $pedido->bindValue(6, $model->valor_total);
 
-                    $insert->bindParam(':ped_id', $ped_id);
-                    $insert->bindParam(':prod_id', $model->prod_id);
-                    $insert->bindParam(':val_unit', $model->val_unit);
-                    $insert->bindParam(':item_ped_qtde', $model->item_ped_qtde);
-                    $insert->bindParam(':item_val_imposto', $model->item_val_imposto);
-                    $insert->bindParam(':valor_total', $model->valor_total);
-
-                    $insert = $this->conexao->prepare($sql_itens);
-
-                    $insert->execute();
+                    $pedido->execute();
                 }
 
                 $model->rows = $stmt->rowCount();
