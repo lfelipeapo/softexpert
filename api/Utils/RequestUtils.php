@@ -151,14 +151,14 @@ class RequestUtils extends Utils
 
     public function validaItensPedidos($model)
     {
-        if ($model and is_array($model->rows)) {
+        if ($model and is_array($model)) {
             $data = [];
-            foreach ($model->rows as $itens_pedido) {
+            foreach ($model as $itens_pedido) {
                 $data[] = $itens_pedido;
             };
             $response = ['records' => $data];
+            $this->encodeResponse($response);
         }
-        $this->encodeResponse($response);
     }
 
     public function validaCliente($model)

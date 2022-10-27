@@ -95,15 +95,14 @@ class PedidosDAO extends DAO
         }
     }
 
-    public function selectAllItens(int $id)
+    public function selectAllItens(int $ped_id)
     {
         $sql = "SELECT * FROM itens_pedido WHERE ped_id = ?";
 
         $stmt = $this->conexao->prepare($sql);
-        $stmt->bindValue(1, $id);
-        $stmt->execute();
+        $stmt->bindValue(1, $ped_id);
 
-        if ($stmt->rowCount() > 0) {
+        if ($stmt->execute()) {
             return $stmt->fetchAll(PDO::FETCH_CLASS);
         } else {
             $response = [
@@ -143,7 +142,7 @@ class PedidosDAO extends DAO
 
         $utils = new RequestUtils;
 
-        $sql = "DELETE FROM clientes WHERE id = ? ";
+        $sql = "DELETE FROM pedidos WHERE id = ? ";
         $stmt = $this->conexao->prepare($sql);
         $stmt->bindValue(1, $id);
 

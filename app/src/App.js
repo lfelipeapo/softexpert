@@ -18,9 +18,9 @@ import { Home as TiposProdutos } from "./pages/TiposProdutos/Home";
 import { Cadastrar as TiposProdutoCad } from "./pages/TiposProdutos/Cadastrar";
 import { Visualizar as TiposProdutoVisualizar } from "./pages/TiposProdutos/Visualizar";
 import { Editar as TiposProdutoEditar } from "./pages/TiposProdutos/Editar";
-//import { Home as Pedido } from "./pages/Vendas/Pedidos/Home";
-//import { Visualizar as Pedidos } from "./pages/Vendas/Pedidos/Visualizar";
-// import { Visualizar as Pedido } from "./pages/Vendas/ItensPedido";
+import { Home as Pedidos } from "./pages/Vendas/Pedidos/Home";
+import { Visualizar as PedidoVisualizar } from "./pages/Vendas/Pedidos/Visualizar";
+import { Visualizar as ItensPedido } from "./pages/Vendas/ItensPedido";
 import { Home as Produtos } from "./pages/Produtos/Home";
 import { Cadastrar as ProdutoCad } from "./pages/Produtos/Cadastrar";
 import { Visualizar as ProdutoVisualizar } from "./pages/Produtos/Visualizar";
@@ -37,7 +37,7 @@ function App() {
         <Route exact path="/clientes" component={Clientes} />
         <Route exact path="/estoque" component={Estoque} />
         <Route exact path="/impostos" component={Impostos} />
-        {/* <Route exact path="/pedidos" component={Pedidos} /> */}
+        <Route exact path="/pedidos" component={Pedidos} />
         <Route exact path="/produtos" component={Produtos} />
         <Route exact path="/tipos-produtos" component={TiposProdutos} />
         <Route path="/clientes/cadastrar" component={ClienteCad} />
@@ -49,8 +49,8 @@ function App() {
         <Route path="/impostos/cadastrar" component={ImpostoCad} />
         <Route path="/impostos/visualizar/:id" component={ImpostoVisualizar} />
         <Route path="/impostos/editar/:id" component={ImpostoEditar} />
-        {/* <Route path="/pedidos/visualizar/:id/itens" component={ItensPedido}/> */}
-        {/* <Route path="/pedidos/visualizar/:id" component={Pedido} /> */}
+        <Route path="/pedidos/visualizar/:id/itens" component={ItensPedido} />
+        <Route path="/pedidos/visualizar/:id" component={PedidoVisualizar} />
         <Route path="/tipos-produtos/cadastrar" component={TiposProdutoCad} />
         <Route
           path="/tipos-produtos/visualizar/:id"

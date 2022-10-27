@@ -33,6 +33,7 @@ export const BemVindo = () => {
               <th></th>
               <th></th>
               <th></th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -65,6 +66,11 @@ export const BemVindo = () => {
               <td>
                 <Link to={"/carrinho/"}>
                   <ButtonPrimary>Carrinho de Compras</ButtonPrimary>
+                </Link>
+              </td>
+              <td>
+                <Link to={"/pedidos/"}>
+                  <ButtonPrimary>Pedidos</ButtonPrimary>
                 </Link>
               </td>
             </tr>

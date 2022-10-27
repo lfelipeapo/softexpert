@@ -19,14 +19,15 @@ class PedidosController extends Controller
         parent::render('Pedidos/ListarPedidos');
     }
 
-    public static function listItens(int $id)
+    public static function listItens(int $ped_id)
     {
         $utils = new RequestUtils;
         $utils->validateGetRequest();
         $model = new PedidosModel();
 
-        if (!$utils->isNil($id)) {
-            $model = $model->getAllRowsItens($id);
+        if (!$utils->isNil($ped_id)) {
+            $model = $model->getAllRowsItens($ped_id);
+            
             $utils->validaItensPedidos($model);
         }
 

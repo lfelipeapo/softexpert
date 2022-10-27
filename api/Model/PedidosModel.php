@@ -39,11 +39,12 @@ class PedidosModel extends Model
         $this->rows = $dao->selectAll();
     }
 
-    public function getAllRowsItens(int $id)
+    public function getAllRowsItens(int $ped_id)
     {
         $dao = new PedidosDAO();
 
-        $this->rows = $dao->selectAllItens($id);
+        return $this->rows = $dao->selectAllItens($ped_id);
+
     }
 
     public function getById(int $id)

@@ -150,9 +150,9 @@ switch (URL) {
         PedidosController::delete($id);
         break;
 
-    case PATH[1] === 'pedidos' and is_numeric(PATH[2]) and PATH[3] === 'itens' and !isset(PATH[4]):
-        $ped_id = PATH[2];
-        PedidosController::listItens($id);
+    case PATH[1] === 'pedidos' and PATH[2] === 'itens' and is_numeric(PATH[3]):
+        $ped_id = PATH[3];
+        PedidosController::listItens($ped_id);
         break;
 
     default:

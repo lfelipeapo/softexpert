@@ -401,6 +401,7 @@ export const Carrinho = () => {
               let novos_estoques = novoEstoque;
               atualizaTodoEstoque(novos_estoques);
               getEstoquesFromProdutos();
+              alert("Pedido feito com sucesso!");
               window.location.reload(true);
             }
           } else {
