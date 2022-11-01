@@ -120,10 +120,6 @@ export const Carrinho = () => {
     setPedido(ped);
   };
 
-  const formatData = (dataSql) => {
-    if (!isNil(dataSql)) return dataSql.split("-").reverse().join("/");
-  };
-
   const valorSelect = (e) => {
     setCliente(clientes.find((cliente) => cliente.cli_id === e.target.value));
   };
@@ -166,10 +162,18 @@ export const Carrinho = () => {
       data_cad: null,
       data_at: date,
     };
-    const novos_estoques = [...novoEstoque, novo_estoque];
-    setNovoEstoque(novos_estoques);
+    let novos_estoques = [...novoEstoque];
+    const estoqueAntigoASerAtualizado = novos_estoques.find(
+      (x) => x.id === novo_estoque.id
+    );
+    if (novos_estoques.includes(estoqueAntigoASerAtualizado)) {
+      estoqueAntigoASerAtualizado.estoque_qtde = novo_estoque.estoque_qtde;
+    } else {
+      novos_estoques = [...novoEstoque, novo_estoque];
+    }
     setProdutos(produtos_estoque);
     setItensCart(copyItensCart);
+    setNovoEstoque(novos_estoques);
   };
 
   const removeProductToCart = (id) => {
@@ -198,11 +202,10 @@ export const Carrinho = () => {
             item.item_ped_qtde--;
             item.item_val_imposto = imposto_produto * item.item_ped_qtde;
             toNumber(parseFloat(item.item_val_imposto).toFixed(2));
-            item.valor_total -=
-              item.item_val_imposto + item.val_unit;
+            item.valor_total -= item.item_val_imposto + item.val_unit;
             toNumber(parseFloat(item.valor_total).toFixed(2));
             setItensCart(copyItensCart);
-          } else if (item.item_ped_qtde == 1) {
+          } else if (item.item_ped_qtde === 1) {
             estoque.estoque_qtde++;
             const arrayFiltered = copyItensCart.filter(
               (produto) => produto.prod_id !== id
@@ -219,8 +222,16 @@ export const Carrinho = () => {
         data_cad: null,
         data_at: date,
       };
-      const novos_estoques = [...novoEstoque, novo_estoque];
-            setNovoEstoque(novos_estoques);
+      let novos_estoques = [...novoEstoque];
+      const estoqueAntigoASerAtualizado = novos_estoques.find(
+        (x) => x.id === novo_estoque.id
+      );
+      if (novos_estoques.includes(estoqueAntigoASerAtualizado)) {
+        estoqueAntigoASerAtualizado.estoque_qtde = novo_estoque.estoque_qtde;
+      } else {
+        novos_estoques = [...novoEstoque, novo_estoque];
+      }
+      setNovoEstoque(novos_estoques);
     }
   };
 
@@ -245,21 +256,25 @@ export const Carrinho = () => {
         );
         setItensCart(arrayFiltered);
         produto.estoque_qtde += item.item_ped_qtde;
-
         const novo_estoque = {
           id: produto.estoque_id,
           prod_id: produto.id,
           estoque_qtde: produto.estoque_qtde,
           data_at: date,
         };
-        
-        const novos_estoques = [...novoEstoque, novo_estoque];
-          setNovoEstoque(novos_estoques);
+        let novos_estoques = [...novoEstoque];
+        const estoqueAntigoASerAtualizado = novos_estoques.find(
+          (x) => x.id === novo_estoque.id
+        );
+        if (novos_estoques.includes(estoqueAntigoASerAtualizado)) {
+          estoqueAntigoASerAtualizado.estoque_qtde = novo_estoque.estoque_qtde;
+        } else {
+          novos_estoques = [...novoEstoque, novo_estoque];
+        }
+        setNovoEstoque(novos_estoques);
       }
     }
   };
-
-  console.log(novoEstoque);
 
   const getEstoquesFromProdutos = async () => {
     setIsLoading(true);
@@ -420,7 +435,6 @@ export const Carrinho = () => {
   };
 
   useEffect(getClientes, []);
-  console.log(pedido);
 
   useEffect(() => {
     selecionarClienteIniciaLista();
@@ -567,9 +581,7 @@ export const Carrinho = () => {
                         </CartRowQuant>
 
                         <CartRowAmount>
-                          <Valores>
-                            {convertReal(item.valor_total)}
-                          </Valores>
+                          <Valores>{convertReal(item.valor_total)}</Valores>
                         </CartRowAmount>
                       </CartRow>
                     ))

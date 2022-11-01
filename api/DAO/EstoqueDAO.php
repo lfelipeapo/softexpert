@@ -79,21 +79,21 @@ class EstoqueDAO extends DAO
             $stmt->bindValue(3, $model->data_cad);
             $stmt->bindValue(4, $model->data_at);
             $stmt->bindValue(5, $model->id);
-
-            if ($stmt->execute()) {
-                $response = [
-                    "erro" => false,
-                    "mensagem" => "Estoque atualizado com sucesso!"
-                ];
-            } else {
-                $response = [
-                    "erro" => true,
-                    "mensagem" => "Não ocorreu nenhuma alteração no registro!"
-                ];
-            }
-            $utils->encodeResponse($response);
-            die;
+            $stmt->execute();
         }
+        if ($stmt->rowCount()) {
+            $response = [
+                "erro" => false,
+                "mensagem" => "Estoque atualizado com sucesso!"
+            ];
+        } else {
+            $response = [
+                "erro" => true,
+                "mensagem" => "Não ocorreu nenhuma alteração no registro!"
+            ];
+        }
+        $utils->encodeResponse($response);
+        die;
     }
 
     public function selectAll()
